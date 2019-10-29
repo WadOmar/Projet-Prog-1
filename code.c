@@ -1,4 +1,4 @@
-#include "../lib/libgraphique.h"
+#include "lib/libgraphique.h"
 #include<stdio.h>
 
 #define L_FENETRE 1200
