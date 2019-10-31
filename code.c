@@ -11,17 +11,42 @@
 #define TAB_DROITE 400
 
 void affichage(void) ;
+void chargement(void) ;
+void menu(void) ;
 
 int main(void)
 	{
 	ouvrir_fenetre(L_FENETRE, H_FENETRE);
 	
+	chargement() ;
+	menu() ;
 	affichage() ;
  
 	//fin du programme
 	attendre_clic() ;
 	fermer_fenetre() ;
 	return 0 ;
+	}
+
+void chargement(void)
+	{
+	int progression = 0;
+	//char chargement[] = "CHARGEMENT";
+	Point coin0 = {0,0}, milieu = {L_FENETRE/2 - 250, H_FENETRE/2 - 50};
+	dessiner_rectangle(coin0, L_FENETRE, H_FENETRE, jaune) ;
+	//afficher_texte(chargement, 20, milieu, blanc) ;
+	while (progression < 500)
+		{
+		dessiner_rectangle(milieu, progression, 100, rouge) ;
+		actualiser() ;
+		progression ++ ;
+		attente(5) ;
+		}
+	}
+
+void menu(void)
+	{
+	printf("Dans le menu\n") ;	
 	}
 
 void affichage(void)
@@ -34,5 +59,3 @@ void affichage(void)
 	
 	actualiser() ;
 	}
-
-
