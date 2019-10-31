@@ -10,6 +10,7 @@
 #define TAB_HAUT 100
 #define TAB_DROITE 400
 
+void bouton(Point posSouris, int x, int y, int l, int h, Couleur cs, Couleur cc) ;
 void affichage(void) ;
 void chargement(void) ;
 void menu(void) ;
@@ -20,14 +21,19 @@ int main(void)
 	
 	chargement() ;
 	menu() ;
+	
 	affichage() ;
- 
+
 	//fin du programme
 	attendre_clic() ;
 	fermer_fenetre() ;
 	return 0 ;
 	}
 
+void bouton(Point posSouris, int x, int y, int l, int h, Couleur cs, Couleur cc)
+	{
+	printf("Bouton") ;
+	}
 void chargement(void)
 	{
 	int progression = 0;
@@ -40,13 +46,15 @@ void chargement(void)
 		dessiner_rectangle(milieu, progression, 100, rouge) ;
 		actualiser() ;
 		progression ++ ;
-		attente(5) ;
+		attente(3) ;
 		}
 	}
 
 void menu(void)
 	{
-	printf("Dans le menu\n") ;	
+	traiter_evenements() ;
+	Point posSouris = deplacement_souris_a_eu_lieu() ;	
+ 	reinitialiser_evenements() ;
 	}
 
 void affichage(void)
