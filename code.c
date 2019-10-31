@@ -1,61 +1,64 @@
 #include "lib/libgraphique.h"
 #include<stdio.h>
+#include<math.h>
 
-#define L_FENETRE 1200
-#define H_FENETRE 700
-
-#define ZONE_DESSIN_LONGUEUR 1000
-#define ZONE_DESSIN_LARGEUR 800
-
-#define TAB_HAUT 100
-#define TAB_DROITE 400
-
-void affichage(void) ;
-void chargement(void) ;
-void menu(void) ;
+void dessiner_segment (Point p1, Point p2);
+void dessiner_triangle (Point p1, Point p2, Point p3);
+void dessiner_rect (Point p1, Point p2, Point p3, Point p4);
+/*void dessiner_rectp(Point p1, int largeur, int hauteur, Couleur );
+void dessiner_disque(Point p1, int rayon, Couleur );*/
 
 int main(void)
+    {
+    //indispensable pour commencer
+    ouvrir_fenetre(1400,900);
+
+	int largeur, hauteur;	
+	Point p1, p2, p3, p4;
+	dessiner_segment(p1,p2);
+	/*dessiner_triangle(p1,p2,p3);*/
+	/*dessiner_rect(p1,p2,p3,p4);*/
+    
+    //fin du programme
+    attendre_clic() ;
+    fermer_fenetre() ;
+    return 0 ;
+    }
+
+
+void dessiner_segment(Point p1, Point p2)
 	{
-	ouvrir_fenetre(L_FENETRE, H_FENETRE);
-	
-	chargement() ;
-	menu() ;
-	affichage() ;
- 
-	//fin du programme
-	attendre_clic() ;
-	fermer_fenetre() ;
-	return 0 ;
+		p1 = attendre_clic();
+		p2 = attendre_clic();			
+		dessiner_ligne(p1,p2, vert);
+		actualiser();	
 	}
 
-void chargement(void)
+/*void dessiner_triangle(Point p1, Point p2, Point p3)
 	{
-	int progression = 0;
-	//char chargement[] = "CHARGEMENT";
-	Point coin0 = {0,0}, milieu = {L_FENETRE/2 - 250, H_FENETRE/2 - 50};
-	dessiner_rectangle(coin0, L_FENETRE, H_FENETRE, jaune) ;
-	//afficher_texte(chargement, 20, milieu, blanc) ;
-	while (progression < 500)
-		{
-		dessiner_rectangle(milieu, progression, 100, rouge) ;
-		actualiser() ;
-		progression ++ ;
-		attente(5) ;
-		}
-	}
+		p1 = attendre_clic();
+		p2 = attendre_clic();
+		p3 = attendre_clic();
+		dessiner_ligne(p1, p2, rouge);
+		dessiner_ligne(p2, p3, rouge);
+		dessiner_ligne(p1, p3, rouge);
+		actualiser();
+	}*/
 
-void menu(void)
+/*void dessiner_rect(Point p1, Point p2, Point p3, Point p4)
 	{
-	printf("Dans le menu\n") ;	
-	}
+		p1 = attendre_clic();
+		p2 = attendre_clic();
+		p3.x = p2.x;
+		p3.y = p1.y;
+		p4.x = p1.x;
+		p4.y = p2.y;
+		dessiner_ligne(p1, p3, bleu);
+		dessiner_ligne(p1, p4, bleu);
+		dessiner_ligne(p2, p4, bleu);
+		dessiner_ligne(p3, p2, bleu);
+		actualiser();
+		
+	}*/
 
-void affichage(void)
-	{
-	Point coin0 = {0,0}, coin1 = {0,150}, coin2 = {ZONE_DESSIN_LONGUEUR, 0} ;
-	
-	dessiner_rectangle(coin0, ZONE_DESSIN_LONGUEUR, TAB_HAUT, gris) ;
-	dessiner_rectangle(coin1, ZONE_DESSIN_LONGUEUR, ZONE_DESSIN_LARGEUR, blanc) ;
-	dessiner_rectangle(coin2, TAB_DROITE, TAB_HAUT, rouge) ;
-	
-	actualiser() ;
-	}
+
