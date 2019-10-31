@@ -2,29 +2,27 @@
 #include<stdio.h>
 
 #define L_FENETRE 1200
-#define H_FENETRE 900
+#define H_FENETRE 700
 
 #define ZONE_DESSIN_LONGUEUR 1000
 #define ZONE_DESSIN_LARGEUR 800
 
 #define TAB_HAUT 100
-#define TAB_BAS 100
 #define TAB_DROITE 400
-
 
 void affichage(void) ;
 
 int main(void)
-    {
-    ouvrir_fenetre(L_FENETRE, H_FENETRE);
+	{
+	ouvrir_fenetre(L_FENETRE, H_FENETRE);
 	
-    affichage() ;
+	affichage() ;
  
-    //fin du programme
-    attendre_clic() ;
-    fermer_fenetre() ;
-    return 0 ;
-    }
+	//fin du programme
+	attendre_clic() ;
+	fermer_fenetre() ;
+	return 0 ;
+	}
 
 void affichage(void)
 	{
