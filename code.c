@@ -1,6 +1,8 @@
 #include "lib/libgraphique.h"
 #include<stdio.h>
 
+// Définition des variables constantes
+
 #define L_FENETRE 1200
 #define H_FENETRE 700
 
@@ -10,23 +12,42 @@
 #define TAB_HAUT 100
 #define TAB_DROITE 400
 
-void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs) ;
+#define NBOUTILS 1
+
+// Prototypes des fonctions
+
+void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs, int outil) ;
 void fill (Couleur couleur) ;
 void affichage(void) ;
 void chargement(void) ;
 void menu(void) ;
+void lancement(void) ;
+void gestionOutils(void) ;
+
+// Déclaration des variables globales
+
+int outils[NBOUTILS] = {0} ;
 
 int main(void)
 	{
-	ouvrir_fenetre(L_FENETRE, H_FENETRE);
+	ouvrir_fenetre(L_FENETRE, H_FENETRE) ;
 	
 	chargement() ;
 	//menu() ;
-	affichage() ;
-
+	
+	int dansPaint = 1 ;
+	
+	while (dansPaint == 1)
+		{
+		gestionOutils() ;
+		affichage() ;
+		}
+	
 	//fin du programme
+	
 	attendre_clic() ;
 	fermer_fenetre() ;
+	
 	return 0 ;
 	}
 
@@ -36,9 +57,10 @@ void fill(Couleur couleur)
 	dessiner_rectangle (coin, L_FENETRE, H_FENETRE, couleur) ;
 	}
 
-void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs)
+void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs, int outilSelect)
 	{
-	Point coin = {x-l/2, y-h/2}, clic;
+	extern int outils[] ;
+	Point coin = {x-l/2, y-h/2}, clic ;
 
 	clic = clic_a_eu_lieu() ;
 	
@@ -47,7 +69,12 @@ void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs)
 		dessiner_rectangle(coin, l, h, cs) ;
 		
 		if (clic.x != -1 && clic.y != -1)
-			printf ("clic") ;
+			{
+			outils[outilSelect] = 1 ;
+			for (int iOutil = 0; iOutil < NBOUTILS; iOutil++)
+				if (iOutil != outilSelect)
+					outils[iOutil] = 0 ;
+			}
 		}
 	else 
 		dessiner_rectangle(coin, l, h, cb) ;
@@ -72,16 +99,23 @@ void chargement(void)
 /*
 void menu(void)
 	{
-	int dansMenu = 1 ;
+	extern int dansMenu ;
+	dansMenu = 1 ;
 	while (dansMenu == 1)
 		{
 		fill(blanc) ;
 		traiter_evenements() ;
 		Point posSouris = deplacement_souris_a_eu_lieu() ;	
-		bouton(posSouris, 500, 300, 200, 100, violet, violetlight) ;
+		bouton(posSouris, 500, 300, 200, 100, violet, violetlight, lancement) ;
 		reinitialiser_evenements() ;
 		actualiser() ;
 		}
+	}
+
+void lancement(void)
+	{
+	extern int dansMenu ;
+	dansMenu = 0 ;
 	}
 */
 
@@ -94,4 +128,22 @@ void affichage(void)
 	dessiner_rectangle(coin2, TAB_DROITE, TAB_HAUT, rouge) ;
 	
 	actualiser() ;
+	}
+
+void gestionOutils(void)
+	{
+	extern int outils[] ;
+	
+	for (int iOutil = 0; iOutil < NBOUTILS; iOutil++)
+		{
+		switch (iOutil)
+			{
+			case 0:
+				printf ("segment !") ;
+				break ;
+			}
+
+		if (outils[iOutil] == 1)
+			printf("genial") ;
+		}
 	}
