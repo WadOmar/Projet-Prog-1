@@ -47,7 +47,7 @@ int main(void)
 	
 	//fin du programme
 	
-	attendre_clic() ;
+	//attendre_clic() ;
 	fermer_fenetre() ;
 	
 	return 0 ;
