@@ -28,6 +28,8 @@ void gestionOutils(void) ;
 
 int outils[NBOUTILS] = {0} ;
 
+// Main
+
 int main(void)
 	{
 	ouvrir_fenetre(L_FENETRE, H_FENETRE) ;
@@ -50,6 +52,8 @@ int main(void)
 	
 	return 0 ;
 	}
+
+// Fonctions 
 
 void fill(Couleur couleur)
 	{
@@ -92,7 +96,7 @@ void chargement(void)
 		dessiner_rectangle(milieu, progression, 100, rouge) ;
 		actualiser() ;
 		progression ++ ;
-		attente(1) ;
+		attente(5) ;
 		}
 	}
 
@@ -123,6 +127,7 @@ void affichage(void)
 	{
 	Point coin0 = {0,0}, coin1 = {0,150}, coin2 = {ZONE_DESSIN_LONGUEUR, 0} ;
 	
+	fill (navajowhite) ;
 	dessiner_rectangle(coin0, ZONE_DESSIN_LONGUEUR, TAB_HAUT, gris) ;
 	dessiner_rectangle(coin1, ZONE_DESSIN_LONGUEUR, ZONE_DESSIN_LARGEUR, blanc) ;
 	dessiner_rectangle(coin2, TAB_DROITE, TAB_HAUT, rouge) ;
@@ -134,12 +139,14 @@ void gestionOutils(void)
 	{
 	extern int outils[] ;
 	
+	Point coin1 = {TAB_DROITE, TAB_HAUT} ;
+	
 	for (int iOutil = 0; iOutil < NBOUTILS; iOutil++)
 		{
 		switch (iOutil)
 			{
 			case 0:
-				printf ("segment !") ;
+				//dessiner_rectangle(coin1, T);
 				break ;
 			}
 
