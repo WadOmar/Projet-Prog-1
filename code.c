@@ -15,7 +15,7 @@
 #define NBOUTILS 1
 
 // Prototypes des fonctions
-
+int dansDessin(Point posSouris) ;
 void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs, int outil) ;
 void fill (Couleur couleur) ;
 void affichage(void) ;
@@ -23,14 +23,16 @@ void chargement(void) ;
 void menu(void) ;
 void lancement(void) ;
 void gestionOutils(void) ;
+//void texte()
 
+void cercleVide() ;
 // Déclaration des variables globales
 
-int outils[NBOUTILS] = {0} ;
+int outil ;
 
 // Main
 
-int main(void)
+int main(int argc, char *argv[])
 	{
 	ouvrir_fenetre(L_FENETRE, H_FENETRE) ;
 	
@@ -63,7 +65,7 @@ void fill(Couleur couleur)
 
 void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs, int outilSelect)
 	{
-	extern int outils[] ;
+	extern int outil ;
 	Point coin = {x-l/2, y-h/2}, clic ;
 
 	clic = clic_a_eu_lieu() ;
@@ -74,10 +76,7 @@ void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs,
 		
 		if (clic.x != -1 && clic.y != -1)
 			{
-			outils[outilSelect] = 1 ;
-			for (int iOutil = 0; iOutil < NBOUTILS; iOutil++)
-				if (iOutil != outilSelect)
-					outils[iOutil] = 0 ;
+			outil = outilSelect ;
 			}
 		}
 	else 
@@ -87,16 +86,20 @@ void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs,
 void chargement(void)
 	{
 	int progression = 0;
-	//char chargement[] = "CHARGEMENT";
-	Point milieu = {L_FENETRE/2 - 250, H_FENETRE/2 - 50};
-	fill(jaune) ;
-	//afficher_texte(chargement, 20, milieu, blanc) ;
+	//char chargement[12] = "CHARGEMENT\0";
+	
+	Point milieu = {L_FENETRE/2 - 250, H_FENETRE/2 - 50} ;
+	Point logo = {milieu.x + 250, milieu.y + 130} ;
+
+	fill(noir) ;
+	afficher_texte("a\0", 20, milieu, blanc) ;
 	while (progression < 500)
 		{
+		afficher_image("logoCpaint.bmp", logo) ;
 		dessiner_rectangle(milieu, progression, 100, rouge) ;
 		actualiser() ;
 		progression ++ ;
-		attente(5) ;
+		attente(3) ;
 		}
 	}
 
@@ -137,20 +140,13 @@ void affichage(void)
 
 void gestionOutils(void)
 	{
-	extern int outils[] ;
+	extern int outil ;
 	
 	Point coin1 = {TAB_DROITE, TAB_HAUT} ;
 	
-	for (int iOutil = 0; iOutil < NBOUTILS; iOutil++)
-		{
-		switch (iOutil)
-			{
-			case 0:
-				//dessiner_rectangle(coin1, T);
-				break ;
-			}
+	}
 
-		if (outils[iOutil] == 1)
-			printf("genial") ;
-		}
+int dansDessin(Point posSouris)
+	{
+	//if (posSouris.x >= 0 && posSouris.x <= ZONE_DESSIN_LONGUEUR)
 	}
