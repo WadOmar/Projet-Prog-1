@@ -343,24 +343,31 @@ void reinitialiser_evenements(void)
 // reinitialisation
 void traiter_evenements(void)
 {
-
-    while(SDL_PollEvent(&lastevent))
+    SDL_Event e;
+    while(SDL_PollEvent(&e))
     {
-        switch(lastevent.type)
+        switch(e.type)
         {
             case SDL_MOUSEMOTION:
-                trace_evts.sourisx = lastevent.motion.x;
-                trace_evts.sourisy = lastevent.motion.y;
+                trace_evts.sourisx = e.motion.x;
+                trace_evts.sourisy = e.motion.y;
                 break;
             case SDL_KEYDOWN:
-                trace_evts.touches[lastevent.key.keysym.sym]=1 ;
+                trace_evts.touches[e.key.keysym.sym]=1 ;
                 break ;
             case SDL_MOUSEBUTTONDOWN:
-                dernier_clic.x = lastevent.motion.x ;
-                dernier_clic.y = lastevent.motion.y ;
+                dernier_clic.x = e.motion.x ;
+                dernier_clic.y = e.motion.y ;
+                break;
+            case SDL_MOUSEBUTTONUP:
+                dernier_clic.x = -1;
+                dernier_clic.y = -1;
+                break;
         }
 
     }
+
+    lastevent = e;
 
 }
 
@@ -377,8 +384,8 @@ int touche_a_ete_pressee(int code)
 Point clic_a_eu_lieu()
 {
     Point res = dernier_clic ;
-    dernier_clic.x = -1;
-    dernier_clic.y = -1 ;
+    //dernier_clic.x = -1;
+    //dernier_clic.y = -1 ;
     return res;
 }
 
