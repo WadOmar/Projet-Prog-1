@@ -16,20 +16,30 @@
 
 // Prototypes des fonctions
 int dansDessin(Point posSouris) ;
-void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs, int outil) ;
+void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs, int outilSelect) ;
 void fill (Couleur couleur) ;
 void affichage(void) ;
 void chargement(void) ;
 void menu(void) ;
-void lancement(void) ;
 void gestionOutils(void) ;
 //void texte()
+void dessinBoutons(void) ;
 
 void cercleVide() ;
 // Déclaration des variables globales
 
-int outil ;
+int outil = -1;
 
+typedef enum
+	{
+	SEGMENT = 0,
+	RECTANGLE_VIDE,
+	CERCLE_VIDE,
+	POLYGONE_VIDE,
+	RECTANGLE_PLEIN,
+	CERCLE_PLEIN,
+	POLYGONE_PLEIN
+	} outils ;
 // Main
 
 int main(int argc, char *argv[])
@@ -43,13 +53,13 @@ int main(int argc, char *argv[])
 	
 	while (dansPaint == 1)
 		{
-		gestionOutils() ;
 		affichage() ;
+		dessinBoutons() ;
+		gestionOutils() ;
 		}
 	
 	//fin du programme
-	
-	//attendre_clic() ;
+
 	fermer_fenetre() ;
 	
 	return 0 ;
@@ -66,7 +76,7 @@ void fill(Couleur couleur)
 void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs, int outilSelect)
 	{
 	extern int outil ;
-	Point coin = {x-l/2, y-h/2}, clic ;
+	Point coin = {x, y}, clic ;
 
 	clic = clic_a_eu_lieu() ;
 	
@@ -77,6 +87,7 @@ void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs,
 		if (clic.x != -1 && clic.y != -1)
 			{
 			outil = outilSelect ;
+			printf("clic !\n") ;
 			}
 		}
 	else 
@@ -92,14 +103,14 @@ void chargement(void)
 	Point logo = {milieu.x + 250, milieu.y + 130} ;
 
 	fill(noir) ;
-	afficher_texte("a\0", 20, milieu, blanc) ;
+	//afficher_texte("a\0", 20, milieu, blanc) ;
 	while (progression < 500)
 		{
 		afficher_image("logoCpaint.bmp", logo) ;
 		dessiner_rectangle(milieu, progression, 100, rouge) ;
 		actualiser() ;
 		progression ++ ;
-		attente(3) ;
+		attente(1) ;
 		}
 	}
 
@@ -111,18 +122,9 @@ void menu(void)
 	while (dansMenu == 1)
 		{
 		fill(blanc) ;
-		traiter_evenements() ;
-		Point posSouris = deplacement_souris_a_eu_lieu() ;	
-		bouton(posSouris, 500, 300, 200, 100, violet, violetlight, lancement) ;
-		reinitialiser_evenements() ;
+		attendre_touche() ;
 		actualiser() ;
 		}
-	}
-
-void lancement(void)
-	{
-	extern int dansMenu ;
-	dansMenu = 0 ;
 	}
 */
 
@@ -134,7 +136,23 @@ void affichage(void)
 	dessiner_rectangle(coin0, ZONE_DESSIN_LONGUEUR, TAB_HAUT, gris) ;
 	dessiner_rectangle(coin1, ZONE_DESSIN_LONGUEUR, ZONE_DESSIN_LARGEUR, blanc) ;
 	dessiner_rectangle(coin2, TAB_DROITE, TAB_HAUT, rouge) ;
+
+	actualiser() ;
+	}
+
+void dessinBoutons(void)
+	{
+	extern int outil ;
+
+	traiter_evenements() ;
+	Point posSouris = deplacement_souris_a_eu_lieu() ;
+	bouton(posSouris, ZONE_DESSIN_LONGUEUR, TAB_HAUT, 50, 50, violet, violetlight, (int)SEGMENT) ;
+	bouton(posSouris, ZONE_DESSIN_LONGUEUR, TAB_HAUT + 100, 50, 50, violet, violetlight, (int)RECTANGLE_VIDE) ;
+	bouton(posSouris, ZONE_DESSIN_LONGUEUR, TAB_HAUT + 200, 50, 50, violet, violetlight, (int)CERCLE_VIDE) ;
+	bouton(posSouris, ZONE_DESSIN_LONGUEUR, TAB_HAUT + 300, 50, 50, violet,	violetlight, (int)POLYGONE_VIDE) ;
 	
+	reinitialiser_evenements() ;
+
 	actualiser() ;
 	}
 
@@ -142,11 +160,28 @@ void gestionOutils(void)
 	{
 	extern int outil ;
 	
-	Point coin1 = {TAB_DROITE, TAB_HAUT} ;
-	
+	switch (outil)
+		{
+		case 0 :
+			printf("segment\n") ;	
+			//dessinerSegment();
+			break ;		
+		case 1 :
+			printf("rectangle Vide\n") ;
+			break ;
+		case 2 :
+			printf("cercle vide\n") ;
+			break ;
+		case 3 :
+			printf("polygone\n") ;
+			break ;
+		}
 	}
 
 int dansDessin(Point posSouris)
 	{
-	//if (posSouris.x >= 0 && posSouris.x <= ZONE_DESSIN_LONGUEUR)
+	if (posSouris.x >= 0 && posSouris.x <= ZONE_DESSIN_LONGUEUR && posSouris.y >= 0 && posSouris.y <= ZONE_DESSIN_LARGEUR)
+		return 1 ;
+	else
+		return 0 ;
 	}
