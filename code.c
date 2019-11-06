@@ -25,6 +25,7 @@ void menu(void) ;
 void gestionOutils(void) ;
 //void texte()
 void dessinBoutons(void) ;
+void afficherAide(char *aide, int taille) ;
 
 void segment(void) ;
 void rectangleVide(void) ;
@@ -32,7 +33,7 @@ void cercleVide(void) ;
 void polygoneVide(void) ;
 // Déclaration des variables globales
 
-static int outil = 2;
+static int outil = 0;
 
 typedef enum
 	{
@@ -49,7 +50,7 @@ typedef enum
 int main(int argc, char *argv[])
 	{
 	ouvrir_fenetre(L_FENETRE, H_FENETRE) ;
-	
+
 	chargement() ;
 	//menu() ;
 	initialisation();
@@ -109,7 +110,7 @@ void chargement(void)
 	Point milieu = {L_FENETRE/2 - 250, H_FENETRE/2 - 50} ;
 	Point logo = {milieu.x + 250, milieu.y + 130} ;
 
-	fill(noir) ;
+	fill(palegreen) ;
 	//afficher_texte("a\0", 20, milieu, blanc) ;
 	while (progression < 500)
 		{
@@ -146,7 +147,9 @@ void initialisation(void)
 
 void affichage(void)
 	{
+	Point p1 = {ZONE_DESSIN_LONGUEUR + 10, TAB_HAUT + 10}, p2 =  {ZONE_DESSIN_LONGUEUR + 30, TAB_HAUT + 40} ;
 	dessinBoutons();
+	dessiner_ligne (p1, p2, blanc) ;
 	actualiser() ;
 	}
 
@@ -169,6 +172,7 @@ void gestionOutils(void)
 	switch (outil)
 		{
 		case 0 :
+			afficherAide("Ceci est un segment", 20) ;
 			segment() ;
 			break ;		
 		case 1 :
@@ -183,6 +187,13 @@ void gestionOutils(void)
 		}
 	}
 
+void afficherAide(char *aide, int taille)
+	{
+	Point coin = {0,TAB_HAUT} ;
+	dessiner_rectangle(coin, ZONE_DESSIN_LONGUEUR, 50, noir) ;
+	//afficher_texte(aide, taille, coin, blanc) ;
+	actualiser () ;
+	}
 int dansDessin(Point posSouris)
 	{
 	if (posSouris.x >= 0 && posSouris.x <= ZONE_DESSIN_LONGUEUR && posSouris.y >= 0 && posSouris.y <= ZONE_DESSIN_LARGEUR)
