@@ -19,8 +19,12 @@
 #define YB2 200
 #define XB3 1000
 #define YB3 250
-#define XB4 1000
-#define YB4 300
+#define XB4 1100
+#define YB4 150
+#define XB5 1100
+#define YB5 200
+#define XB6 1100
+#define YB6 250
 
 // Prototypes des fonctions
 void initialisation(void) ;
@@ -39,6 +43,8 @@ void segment(void) ;
 void rectangleVide(void) ;
 void cercleVide(void) ;
 void polygoneVide(void) ;
+void rectanglePlein(void) ;
+void cerclePlein(void) ;
 // Déclaration des variables globales
 
 static int outil = -1;
@@ -51,8 +57,7 @@ typedef enum
 	CERCLE_VIDE,
 	POLYGONE_VIDE,
 	RECTANGLE_PLEIN,
-	CERCLE_PLEIN,
-	POLYGONE_PLEIN
+	CERCLE_PLEIN
 	} outils ;
 // Main
 
@@ -90,12 +95,14 @@ void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs,
 	{
 	Point coin = {x, y}, clic ;
 	Point pSeg1 = {XB1 + 10, YB1 + 10}, pSeg2 =  {XB1 + 30, YB1 + 40} ;
-	Point pRect1 = {XB2 + 10, YB2 + 113}, pRect2 =  {XB2 + 40, YB2 + 113};
-	Point pRect3 = {XB2 + 40, YB2 + 133}, pRect4 = {XB2 + 10, YB2 + 133};
-	Point pCerc1 = {XB3 + 25, YB3 +225};
-	Point pPol1 = {XB4 + 15, YB4 + 310}, pPol2 =  {XB4 + 30, YB4 + 312} ;
-	Point pPol3 = {XB4 + 40, YB4 + 325}, pPol4 =  {XB4 + 25, YB4 + 340} ;
-	Point pPol5 = {XB4 + 13, YB4 + 335} ;
+	Point pRect1 = {XB2 + 10, YB2 + 63}, pRect2 =  {XB2 + 40, YB2 + 63};
+	Point pRect3 = {XB2 + 40, YB2 + 83}, pRect4 = {XB2 + 10, YB2 + 83};
+	Point pCercv = {XB3 + 25, YB3 + 125};
+	Point pPol1 = {XB4 + 15, YB4 + 10}, pPol2 =  {XB4 + 30, YB4 + 12} ;
+	Point pPol3 = {XB4 + 40, YB4 + 25}, pPol4 =  {XB4 + 25, YB4 + 40} ;
+	Point pPol5 = {XB4 + 13, YB4 + 35} ;
+	Point pRectp = {XB5 + 10, YB5 + 63} ;
+	Point pCercp = {XB6 + 25, YB6 + 125} ;
 	clic = clic_a_eu_lieu() ;
 
 
@@ -125,7 +132,7 @@ void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs,
 			dessiner_ligne (pRect4, pRect1, blanc) ;
 			break ;
 		case 2 :
-			dessiner_disque (pCerc1, 15, blanc) ;
+			dessiner_disque (pCercv, 15, blanc) ;
 			break ;
 		case 3 :
 			dessiner_ligne (pPol1, pPol2, blanc) ;
@@ -133,6 +140,12 @@ void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs,
 			dessiner_ligne (pPol3, pPol4, blanc) ;
 			dessiner_ligne (pPol4, pPol5, blanc) ;
 			dessiner_ligne (pPol5, pPol1, blanc) ;
+			break ;
+		case 4 :
+			dessiner_rectangle(pRectp, 30, 20, noir) ;
+			break ;
+		case 5 :
+			dessiner_disque (pCercp, 15, noir) ;
 			break ;
 		}
 	}
@@ -193,9 +206,11 @@ void dessinBoutons(void)
 	bouton(posSouris, ZONE_DESSIN_LONGUEUR, 0, TAB_DROITE, TAB_HAUT, darkred, red, 666) ;	
 	
 	bouton(posSouris, XB1, YB1, 50, 50, violet, violetlight, (int)SEGMENT) ;
-	bouton(posSouris, XB2, YB2 + 100, 50, 50, violet, violetlight, (int)RECTANGLE_VIDE) ;
-	bouton(posSouris, XB3, YB3 + 200, 50, 50, violet, violetlight, (int)CERCLE_VIDE) ;
-	bouton(posSouris, XB4, YB4 + 300, 50, 50, violet,	violetlight, (int)POLYGONE_VIDE) ;
+	bouton(posSouris, XB2, YB2 + 50, 50, 50, violet, violetlight, (int)RECTANGLE_VIDE) ;
+	bouton(posSouris, XB3, YB3 + 100, 50, 50, violet, violetlight, (int)CERCLE_VIDE) ;
+	bouton(posSouris, XB4, YB4, 50, 50, violet,	violetlight, (int)POLYGONE_VIDE) ;
+	bouton(posSouris, XB5, YB5 + 50, 50, 50, violet, violetlight, (int)RECTANGLE_PLEIN) ;
+	bouton(posSouris, XB6, YB6 + 100, 50, 50, violet, violetlight, (int)CERCLE_PLEIN) ;
 	reinitialiser_evenements() ;
 	}
 
@@ -208,16 +223,24 @@ void gestionOutils(void)
 			segment() ;
 			break ;		
 		case 1 :
-			afficherAide("Choissisez 2 points diagonales pour la création du rectangle !", 20) ;
+			afficherAide("Choissisez 2 points diagonales pour la création du rectangle vide !", 20) ;
 			rectangleVide() ;
 			break ;
 		case 2 :
-			afficherAide("Choissisez 2 points qui formeront le rayon de votre cercle !", 20) ;
+			afficherAide("Choissisez 2 points qui formeront le rayon de votre cercle vide !", 20) ;
 			cercleVide() ;
 			break ;
 		case 3 :
 			afficherAide("Grâce au clic gauche vous créez des segments entre chaque vos 2 derniers points et grâce au clic droit vos finissez la création du votre polygone en réunissant le dernier point avec le premier !", 20) ;
 			polygoneVide() ;
+			break ;
+		case 4 :
+			afficherAide("Choissisez 2 points diagonales pour la création du rectangle plein !", 20) ;
+			rectanglePlein();
+			break ;
+		case 5 :
+			afficherAide("Choissisez 2 points qui formeront le rayon de votre disque !", 20) ;
+			cerclePlein();
 			break ;
 		}
 	}
@@ -310,4 +333,55 @@ void polygoneVide(void)
 			}
 		}
 
-}
+	}
+
+void rectanglePlein(void)
+	{
+	int largeur, hauteur;
+	Point p1 = attendre_clic();
+	Point p2 = attendre_clic();
+	Point coin;
+	if (p1.x < p2.x && p1.y < p2.y)	
+		{		
+		largeur = p2.x - p1.x;
+		hauteur = p2.y - p1.y;
+		if (dansDessin(p1) == 1 && dansDessin(p2) == 1)	
+			dessiner_rectangle (p1, largeur, hauteur, vert);
+		}
+	else if (p1.x < p2.x && p1.y > p2.y)
+		{
+		largeur = p2.x - p1.x;
+		hauteur = p1.y - p2.y;
+		coin.x = p1.x; 
+		coin.y = p2.y;
+		if (dansDessin(p1) == 1 && dansDessin(p2) == 1)	
+			dessiner_rectangle (coin, largeur, hauteur, vert);
+		}
+	else if (p1.x > p2.x && p1.y < p2.y)
+		{
+		largeur = p1.x - p2.x;
+		hauteur = p2.y - p1.y;
+		coin.x = p2.x; 
+		coin.y = p1.y;
+		if (dansDessin(p1) == 1 && dansDessin(p2) == 1)
+			dessiner_rectangle (coin, largeur, hauteur, vert);
+		}
+	else 
+		{
+		largeur = p1.x - p2.x;
+		hauteur = p1.y - p2.y;
+		if (dansDessin(p1) == 1 && dansDessin(p2) == 1)
+			dessiner_rectangle (p2, largeur, hauteur, vert);
+		}
+	actualiser();
+	}
+	
+void cerclePlein(void)
+	{
+	Point p1 = attendre_clic();
+	Point p2 = attendre_clic();
+	int rayon;
+	rayon = sqrt(pow((p2.x - p1.x),2) + pow((p2.y - p1.y),2));
+	dessiner_disque (p1, rayon, couleur);
+	actualiser();
+	}
