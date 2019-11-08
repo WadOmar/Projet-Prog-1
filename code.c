@@ -12,7 +12,14 @@
 #define TAB_HAUT 100
 #define TAB_DROITE 400
 
-#define NBOUTILS 1
+#define XB1 1000
+#define YB1 150
+#define XB2 1000 
+#define YB2 200
+#define XB3 1000
+#define YB3 250
+#define XB4 1000
+#define YB4 250
 
 // Prototypes des fonctions
 void initialisation(void) ;
@@ -33,7 +40,8 @@ void cercleVide(void) ;
 void polygoneVide(void) ;
 // Déclaration des variables globales
 
-static int outil = 0;
+static int outil = -1;
+static int couleur = -1;
 
 typedef enum
 	{
@@ -80,19 +88,19 @@ void fill(Couleur couleur)
 void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs, int outilSelect)
 	{
 	Point coin = {x, y}, clic ;
-
+	Point pSeg1 = {XB1 + 10, YB1 + 10}, pSeg2 =  {XB1 + 30, YB1 + 40} ;
+	Point pRect1 = {XB2 + 10, YB2 + 10}, pRect2 =  {XB2 + 30, YB2 + 30};
+	Point pRect3 = {XB2 + 30, YB2 + 40}, pRect4 = {XB2 + 10, YB2 + 40};
 	clic = clic_a_eu_lieu() ;
 
 
 	if (posSouris.x > coin.x && posSouris.x < coin.x + l && posSouris.y > coin.y && posSouris.y < coin.y + h)
 		{
-		printf("(%d, %d) (%d, %d)\n", x, y, clic.x, clic.y);
 		dessiner_rectangle(coin, l, h, cs);
 		
 		if (clic.x != -1 && clic.y != -1)
 			{
 			outil = outilSelect ;
-			printf("clic !\n") ;
 			
 			if (outilSelect == 666)
 				initialisation () ;
@@ -100,8 +108,26 @@ void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs,
 		}
 	else 
 		dessiner_rectangle(coin, l, h, cb) ;
+	
+	switch (outilSelect)
+		{
+		case 0 :
+			dessiner_ligne (pSeg1, pSeg2, blanc) ;
+			break ;		
+		case 1 :
+			dessiner_ligne (pRect1, pRect2, blanc) ;
+			dessiner_ligne (pRect2, pRect3, blanc) ;
+			dessiner_ligne (pRect3, pRect4, blanc) ;
+			dessiner_ligne (pRect4, pRect1, blanc) ;
+			break ;
+		case 2 :
+			
+			break ;
+		case 3 :
+			
+			break ;
+		}
 	}
-
 void chargement(void)
 	{
 	int progression = 0;
@@ -147,9 +173,7 @@ void initialisation(void)
 
 void affichage(void)
 	{
-	Point p1 = {ZONE_DESSIN_LONGUEUR + 10, TAB_HAUT + 10}, p2 =  {ZONE_DESSIN_LONGUEUR + 30, TAB_HAUT + 40} ;
 	dessinBoutons();
-	dessiner_ligne (p1, p2, blanc) ;
 	actualiser() ;
 	}
 
@@ -160,10 +184,10 @@ void dessinBoutons(void)
 	
 	bouton(posSouris, ZONE_DESSIN_LONGUEUR, 0, TAB_DROITE, TAB_HAUT, darkred, red, 666) ;	
 	
-	bouton(posSouris, ZONE_DESSIN_LONGUEUR, TAB_HAUT, 50, 50, violet, violetlight, (int)SEGMENT) ;
-	bouton(posSouris, ZONE_DESSIN_LONGUEUR, TAB_HAUT + 100, 50, 50, violet, violetlight, (int)RECTANGLE_VIDE) ;
-	bouton(posSouris, ZONE_DESSIN_LONGUEUR, TAB_HAUT + 200, 50, 50, violet, violetlight, (int)CERCLE_VIDE) ;
-	bouton(posSouris, ZONE_DESSIN_LONGUEUR, TAB_HAUT + 300, 50, 50, violet,	violetlight, (int)POLYGONE_VIDE) ;
+	bouton(posSouris, XB1, YB1, 50, 50, violet, violetlight, (int)SEGMENT) ;
+	bouton(posSouris, XB2, YB2 + 100, 50, 50, violet, violetlight, (int)RECTANGLE_VIDE) ;
+	bouton(posSouris, XB3, YB3 + 200, 50, 50, violet, violetlight, (int)CERCLE_VIDE) ;
+	bouton(posSouris, XB4, YB4 + 300, 50, 50, violet,	violetlight, (int)POLYGONE_VIDE) ;
 	reinitialiser_evenements() ;
 	}
 
@@ -196,7 +220,7 @@ void afficherAide(char *aide, int taille)
 	}
 int dansDessin(Point posSouris)
 	{
-	if (posSouris.x >= 0 && posSouris.x <= ZONE_DESSIN_LONGUEUR && posSouris.y >= 0 && posSouris.y <= ZONE_DESSIN_LARGEUR)
+	if (posSouris.x >= 0 && posSouris.x <= ZONE_DESSIN_LONGUEUR && posSouris.y >= (TAB_HAUT + 50) && posSouris.y <= ZONE_DESSIN_LARGEUR)
 		return 1 ;
 	else
 		return 0 ;
@@ -206,8 +230,10 @@ void segment (void)
 	{
 	Point p1, p2 ;	
 	p1 = attendre_clic();
-	p2 = attendre_clic();			
-	dessiner_ligne(p1,p2, vert);
+	p2 = attendre_clic();
+	if (dansDessin(p1) == 1 && dansDessin(p2) == 1)
+		dessiner_ligne(p1,p2, vert);
+	outil = -1 ;
 	}
 
 void rectangleVide (void)
@@ -219,10 +245,15 @@ void rectangleVide (void)
 	p3.y = p1.y;
 	p4.x = p1.x;
 	p4.y = p2.y;
-	dessiner_ligne(p1, p3, bleu);
-	dessiner_ligne(p1, p4, bleu);
-	dessiner_ligne(p2, p4, bleu);
-	dessiner_ligne(p3, p2, bleu);
+	
+	if (dansDessin(p1) == 1 && dansDessin(p2) == 1 && dansDessin(p3) == 1 && dansDessin(p4) == 1)
+		{
+		dessiner_ligne(p1, p3, bleu);
+		dessiner_ligne(p1, p4, bleu);
+		dessiner_ligne(p2, p4, bleu);
+		dessiner_ligne(p3, p2, bleu);
+		}
+	outil = -1 ;
 	}
 
 void cercleVide(void)
@@ -232,5 +263,35 @@ void cercleVide(void)
 
 void polygoneVide(void)
 	{
+	Point p1, p2, p3;
+	int clicDroit = 0 ;
+	
+	p1 = attendre_clic_gauche_droite() ;
+	p2 = attendre_clic_gauche_droite() ;
+	
+	if (dansDessin(p1) == 1 && dansDessin(p2) == 1)
+		{
+		dessiner_ligne(p1, p2, bleu) ;
+		actualiser () ;
+		while (clicDroit == 0)
+			{
+			p3 = attendre_clic_gauche_droite() ;
+			if (p3.x < 0)
+				{
+				p3.x = -p3.x ;
+				p3.y = -p3.y ;
+				dessiner_ligne (p2, p1, bleu) ;
+				clicDroit = 1 ;
+				outil = -1 ;
+				}
+			else
+				dessiner_ligne (p2, p3, bleu) ;
+			
+			actualiser () ;
+				
+			p2.x = p3.x;
+			p2.y = p3.y ;
+			}
+		}
 
 	}
