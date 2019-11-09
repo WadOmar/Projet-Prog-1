@@ -162,7 +162,7 @@ void chargement(void)
 	while (progression < 500)
 		{
 		afficher_image("logoCpaint.bmp", logo) ;
-		dessiner_rectangle(milieu, progression, 100, rouge) ;
+		dessiner_rectangle(milieu, progression, 20, rouge) ;
 		actualiser() ;
 		progression ++ ;
 		attente(1) ;
@@ -223,23 +223,23 @@ void gestionOutils(void)
 			segment() ;
 			break ;		
 		case 1 :
-			afficherAide("Choissisez 2 points diagonales pour la création du rectangle vide !", 20) ;
+			//afficherAide("Choissisez 2 points diagonales pour la création du rectangle vide !", 20) ;
 			rectangleVide() ;
 			break ;
 		case 2 :
-			afficherAide("Choissisez 2 points qui formeront le rayon de votre cercle vide !", 20) ;
+			//afficherAide("Choissisez 2 points qui formeront le rayon de votre cercle vide !", 20) ;
 			cercleVide() ;
 			break ;
 		case 3 :
-			afficherAide("Grâce au clic gauche vous créez des segments entre chaque vos 2 derniers points et grâce au clic droit vos finissez la création du votre polygone en réunissant le dernier point avec le premier !", 20) ;
+			//afficherAide("Grâce au clic gauche vous créez des segments entre chaque vos 2 derniers points et grâce au clic droit vos finissez la création du votre polygone en réunissant le dernier point avec le premier !", 20) ;
 			polygoneVide() ;
 			break ;
 		case 4 :
-			afficherAide("Choissisez 2 points diagonales pour la création du rectangle plein !", 20) ;
+			//afficherAide("Choissisez 2 points diagonales pour la création du rectangle plein !", 20) ;
 			rectanglePlein();
 			break ;
 		case 5 :
-			afficherAide("Choissisez 2 points qui formeront le rayon de votre disque !", 20) ;
+			//afficherAide("Choissisez 2 points qui formeront le rayon de votre disque !", 20) ;
 			cerclePlein();
 			break ;
 		}
