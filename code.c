@@ -1,6 +1,6 @@
 #include "lib/libgraphique.h"
 #include<stdio.h>
-
+#include<math.h>
 // Définition des variables constantes
 
 #define L_FENETRE 1200
@@ -15,11 +15,15 @@
 #define XB1 1000
 #define YB1 150
 #define XB2 1000 
-#define YB2 200
+#define YB2 250
 #define XB3 1000
-#define YB3 250
-#define XB4 1000
-#define YB4 250
+#define YB3 350
+#define XB4 1100
+#define YB4 150
+#define XB5 1100
+#define YB5 250
+#define XB6 1100
+#define YB6 350
 
 // Prototypes des fonctions
 void initialisation(void) ;
@@ -38,6 +42,8 @@ void segment(void) ;
 void rectangleVide(void) ;
 void cercleVide(void) ;
 void polygoneVide(void) ;
+void rectanglePlein(void) ;
+void cerclePlein(void) ;
 // Déclaration des variables globales
 
 static int outil = -1;
@@ -50,8 +56,7 @@ typedef enum
 	CERCLE_VIDE,
 	POLYGONE_VIDE,
 	RECTANGLE_PLEIN,
-	CERCLE_PLEIN,
-	POLYGONE_PLEIN
+	CERCLE_PLEIN
 	} outils ;
 // Main
 
@@ -88,11 +93,15 @@ void fill(Couleur couleur)
 void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs, int outilSelect)
 	{
 	Point coin = {x, y}, clic ;
-	Point pSeg1 = {XB1 + 10, YB1 + 10}, pSeg2 =  {XB1 + 30, YB1 + 40} ;
-	Point pRect1 = {XB2 + 10, YB2 + 10}, pRect2 =  {XB2 + 30, YB2 + 30};
-	Point pRect3 = {XB2 + 30, YB2 + 40}, pRect4 = {XB2 + 10, YB2 + 40};
-	clic = clic_a_eu_lieu() ;
+	Point p_rect1 = {XB2 + 5, YB2 + 12}, p_rect2 =  {XB2 + 45, YB2 + 12}, p_rect3 = {XB2 + 45, YB2 + 38}, p_rect4 = {XB2 + 5, YB2 + 38} ;
+	Point p_pol1 = {XB4 + 15, YB4 + 10}, p_pol2 =  {XB4 + 30, YB4 + 12}, p_pol3 = {XB4 + 40, YB4 + 25} ;
+	Point p_pol4 =  {XB4 + 25, YB4 + 40}, p_pol5 = {XB4 + 13, YB4 + 35} ;
+	Point p_seg1 = {XB1 + 10, YB1 + 10}, p_seg2 =  {XB1 + 30, YB1 + 40} ;
+	Point p_cercleV = {XB3 + 25, YB3 + 25} ;
+	Point p_rectP = {XB5 + 5, YB5 + 12} ;
+	Point p_cercleP = {XB6 + 25, YB6 + 25} ;
 
+	clic = clic_a_eu_lieu() ;
 
 	if (posSouris.x > coin.x && posSouris.x < coin.x + l && posSouris.y > coin.y && posSouris.y < coin.y + h)
 		{
@@ -111,20 +120,30 @@ void bouton(Point posSouris, int x, int y, int l, int h, Couleur cb, Couleur cs,
 	
 	switch (outilSelect)
 		{
-		case 0 :
-			dessiner_ligne (pSeg1, pSeg2, blanc) ;
+		case (int)SEGMENT :
+			dessiner_ligne (p_seg1, p_seg2, blanc) ;
 			break ;		
-		case 1 :
-			dessiner_ligne (pRect1, pRect2, blanc) ;
-			dessiner_ligne (pRect2, pRect3, blanc) ;
-			dessiner_ligne (pRect3, pRect4, blanc) ;
-			dessiner_ligne (pRect4, pRect1, blanc) ;
+		case (int)RECTANGLE_VIDE :
+			dessiner_ligne (p_rect1, p_rect2, blanc) ;
+			dessiner_ligne (p_rect2, p_rect3, blanc) ;
+			dessiner_ligne (p_rect3, p_rect4, blanc) ;
+			dessiner_ligne (p_rect4, p_rect1, blanc) ;
 			break ;
-		case 2 :
-			
+		case (int)CERCLE_VIDE:
+			dessiner_disque (p_cercleV, 15, blanc) ;
 			break ;
-		case 3 :
-			
+		case (int)POLYGONE_VIDE :
+			dessiner_ligne (p_pol1, p_pol2, blanc) ;
+			dessiner_ligne (p_pol2, p_pol3, blanc) ;
+			dessiner_ligne (p_pol3, p_pol4, blanc) ;
+			dessiner_ligne (p_pol4, p_pol5, blanc) ;
+			dessiner_ligne (p_pol5, p_pol1, blanc) ;
+			break ;
+		case (int)RECTANGLE_PLEIN :
+			dessiner_rectangle(p_rectP, 40, 26, noir) ;
+			break ;
+		case (int)CERCLE_PLEIN :
+			dessiner_disque (p_cercleP, 15, noir) ;
 			break ;
 		}
 	}
@@ -133,7 +152,7 @@ void chargement(void)
 	int progression = 0;
 	//char chargement[12] = "CHARGEMENT\0";
 	
-	Point milieu = {L_FENETRE/2 - 250, H_FENETRE/2 - 50} ;
+	Point milieu = {L_FENETRE/2 - 250, H_FENETRE/2} ;
 	Point logo = {milieu.x + 250, milieu.y + 130} ;
 
 	fill(palegreen) ;
@@ -141,7 +160,7 @@ void chargement(void)
 	while (progression < 500)
 		{
 		afficher_image("logoCpaint.bmp", logo) ;
-		dessiner_rectangle(milieu, progression, 100, rouge) ;
+		dessiner_rectangle(milieu, progression, 20, rouge) ;
 		actualiser() ;
 		progression ++ ;
 		attente(1) ;
@@ -185,9 +204,11 @@ void dessinBoutons(void)
 	bouton(posSouris, ZONE_DESSIN_LONGUEUR, 0, TAB_DROITE, TAB_HAUT, darkred, red, 666) ;	
 	
 	bouton(posSouris, XB1, YB1, 50, 50, violet, violetlight, (int)SEGMENT) ;
-	bouton(posSouris, XB2, YB2 + 100, 50, 50, violet, violetlight, (int)RECTANGLE_VIDE) ;
-	bouton(posSouris, XB3, YB3 + 200, 50, 50, violet, violetlight, (int)CERCLE_VIDE) ;
-	bouton(posSouris, XB4, YB4 + 300, 50, 50, violet,	violetlight, (int)POLYGONE_VIDE) ;
+	bouton(posSouris, XB2, YB2, 50, 50, violet, violetlight, (int)RECTANGLE_VIDE) ;
+	bouton(posSouris, XB3, YB3, 50, 50, violet, violetlight, (int)CERCLE_VIDE) ;
+	bouton(posSouris, XB4, YB4, 50, 50, violet, violetlight, (int)POLYGONE_VIDE) ;
+	bouton(posSouris, XB5, YB5, 50, 50, violet, violetlight, (int)RECTANGLE_PLEIN) ;
+	bouton(posSouris, XB6, YB6, 50, 50, violet, violetlight, (int)CERCLE_PLEIN) ;
 	reinitialiser_evenements() ;
 	}
 
@@ -195,18 +216,24 @@ void gestionOutils(void)
 	{
 	switch (outil)
 		{
-		case 0 :
+		case (int)SEGMENT :
 			afficherAide("Ceci est un segment", 20) ;
 			segment() ;
 			break ;		
-		case 1 :
+		case (int)RECTANGLE_VIDE :
 			rectangleVide() ;
 			break ;
-		case 2 :
+		case (int)CERCLE_VIDE :
 			cercleVide() ;
 			break ;
-		case 3 :
+		case (int)POLYGONE_VIDE :
 			polygoneVide() ;
+			break ;
+		case (int)RECTANGLE_PLEIN :
+			rectanglePlein() ;
+			break ;
+		case (int)CERCLE_PLEIN:
+			cerclePlein() ;
 			break ;
 		}
 	}
@@ -282,7 +309,6 @@ void polygoneVide(void)
 				p3.y = -p3.y ;
 				dessiner_ligne (p2, p1, bleu) ;
 				clicDroit = 1 ;
-				outil = -1 ;
 				}
 			else
 				dessiner_ligne (p2, p3, bleu) ;
@@ -293,5 +319,54 @@ void polygoneVide(void)
 			p2.y = p3.y ;
 			}
 		}
+	outil = -1 ;
+	}
+void rectanglePlein(void)
+	{
+	int largeur, hauteur ;
+	Point p1 = attendre_clic() ;
+	Point p2 = attendre_clic() ;
+	Point coin;
 
+	if (dansDessin(p1) == 1 && dansDessin(p2) == 1)	
+		{	
+		if (p1.x < p2.x && p1.y < p2.y)	
+			{		
+			largeur = p2.x - p1.x;
+			hauteur = p2.y - p1.y;
+			dessiner_rectangle (p1, largeur, hauteur, vert);
+			}
+		else if (p1.x < p2.x && p1.y > p2.y)
+			{
+			largeur = p2.x - p1.x;
+			hauteur = p1.y - p2.y;
+			coin.x = p1.x; 
+			coin.y = p2.y;	
+			dessiner_rectangle (coin, largeur, hauteur, vert);
+			}
+		else if (p1.x > p2.x && p1.y < p2.y)
+			{
+			largeur = p1.x - p2.x;
+			hauteur = p2.y - p1.y;
+			coin.x = p2.x; 
+			coin.y = p1.y;
+			dessiner_rectangle (coin, largeur, hauteur, vert);
+			}
+		else 
+			{
+			largeur = p1.x - p2.x;
+			hauteur = p1.y - p2.y;
+			dessiner_rectangle (p2, largeur, hauteur, vert);
+			}
+		}
+	outil = -1 ;
+	}
+void cerclePlein(void)
+	{
+	Point p1 = attendre_clic();
+	Point p2 = attendre_clic();
+
+	int rayon = sqrt(pow((p2.x - p1.x),2) + pow((p2.y - p1.y),2));
+	dessiner_disque (p1, rayon, noir);
+	outil = -1 ;
 	}
