@@ -33,7 +33,7 @@ Point dernier_clic = {-1,-1};
 int LARGEUR = -1 ;                         // largeur de l'écran en pixels
 int HAUTEUR = -1 ;                         // hauteur de l'écran en pixels
 //char *NOM_POLICE = "../lib/verdana.ttf" ;
-char *NOM_POLICE = "../lib/verdana.ttf" ;
+char *NOM_POLICE = "lib/verdana.ttf" ;
 #define octets_par_pixel ecran->format->BytesPerPixel
 #define largeur_ecran (ecran->pitch / 4)
 
@@ -343,31 +343,24 @@ void reinitialiser_evenements(void)
 // reinitialisation
 void traiter_evenements(void)
 {
-    SDL_Event e;
-    while(SDL_PollEvent(&e))
+
+    while(SDL_PollEvent(&lastevent))
     {
-        switch(e.type)
+        switch(lastevent.type)
         {
             case SDL_MOUSEMOTION:
-                trace_evts.sourisx = e.motion.x;
-                trace_evts.sourisy = e.motion.y;
+                trace_evts.sourisx = lastevent.motion.x;
+                trace_evts.sourisy = lastevent.motion.y;
                 break;
             case SDL_KEYDOWN:
-                trace_evts.touches[e.key.keysym.sym]=1 ;
+                trace_evts.touches[lastevent.key.keysym.sym]=1 ;
                 break ;
             case SDL_MOUSEBUTTONDOWN:
-                dernier_clic.x = e.motion.x ;
-                dernier_clic.y = e.motion.y ;
-                break;
-            case SDL_MOUSEBUTTONUP:
-                dernier_clic.x = -1;
-                dernier_clic.y = -1;
-                break;
+                dernier_clic.x = lastevent.motion.x ;
+                dernier_clic.y = lastevent.motion.y ;
         }
 
     }
-
-    lastevent = e;
 
 }
 
@@ -384,8 +377,8 @@ int touche_a_ete_pressee(int code)
 Point clic_a_eu_lieu()
 {
     Point res = dernier_clic ;
-    //dernier_clic.x = -1;
-    //dernier_clic.y = -1 ;
+    dernier_clic.x = -1;
+    dernier_clic.y = -1 ;
     return res;
 }
 

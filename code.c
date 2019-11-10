@@ -21,21 +21,23 @@
 /* Positions (x;y) des boutons */
 #define XB1 1050
 #define YB1 170
-#define XB2 1050 
+#define XB2 1010 
 #define YB2 240
 #define XB3 1050
 #define YB3 310
 #define XB4 1100
 #define YB4 170
-#define XB5 1100
+#define XB5 1060
 #define YB5 240
-#define XB6 1100
+#define XB6 1060
 #define YB6 310
-#define XB7 1050
+#define XB7 1100
 #define YB7 450
+#define XB8 1110
+#define YB8 240
 
 /* Positions (x;y) des palettes de couleurs */
-#define XP1 790
+#define XP1 600
 #define YP1 5
 #define XP2 900
 #define YP2 5
@@ -62,8 +64,10 @@ void cercleVide(void) ;
 void polygoneVide(void) ;
 void rectanglePlein(void) ;
 void cerclePlein(void) ;
+void rectangleRaye(void) ;
 
 void remplissage(int x, int y, Couleur ac, Couleur nc) ;
+
 /* Déclaration et initialistion des variables globales */
 
 static Couleur C_couleurTrait = blanc; 
@@ -73,6 +77,7 @@ static int i_outil = -1 ; // Correspond à l'outil selectionné
 static Point P_clic ;
 static int b_esc ;
 static int b_clicGauche ;
+static int i_tailleTrait = 1 ;
 
 /* Déclaration des nouveaux types */
 
@@ -84,7 +89,8 @@ typedef enum
 	CERCLE_VIDE,
 	POLYGONE_VIDE,
 	RECTANGLE_PLEIN,
-	CERCLE_PLEIN
+	CERCLE_PLEIN,
+	RECTANGLE_RAYE
 	} i_outils ;
 
 int main(int argc, char *argv[])
@@ -150,20 +156,21 @@ void bouton(int x, int y, int l, int h, Couleur cb, Couleur cs, int i_outilSelec
 void chargement(void)
 	{
 	int i_progression = 0 ;
-	//char chargement[12] = "CHARGEMENT\0" ;
 	
 	Point p_milieu = {L_FENETRE/2 - 250, H_FENETRE/2} ;
 	Point p_logo = {p_milieu.x + 250, p_milieu.y + 130} ;
-
-	fill(palegreen) ;
-	//afficher_texte("a\0", 20, milieu, blanc) ;
+	Point p_chargement = {p_milieu.x + 150, p_milieu.y + 20} , p_fake = {p_chargement.x, p_chargement.y + 50};
+	fill(noir) ;
+	afficher_texte("CHARGEMENT", 30, p_chargement, blanc) ;
 	while (i_progression < 500)
 		{
 		afficher_image("images/logoCpaint.bmp", p_logo) ;
 		dessiner_rectangle(p_milieu, i_progression, 20, rouge) ;
 		actualiser() ;
 		i_progression ++ ;
-		attente(1) ;
+		attente(3) ;
+		if (i_progression == 250)
+			afficher_texte("C'est faux (:", 30, p_fake, palegreen) ;
 		}
 	}
 
@@ -183,14 +190,18 @@ void menu(void)
 
 void initialisation(void)
 	{
-	Point p_coin0 = {0,0}, p_coin1 = {0,150}, p_coin2 = {ZONE_DESSIN_LONGUEUR, 0}, p_palette1 = {XP1, YP1}, p_palette2 = {XP2, YP2} ;
-	
+	Point p_coin0 = {0,0}, p_coin1 = {0,150}, p_coin2 = {ZONE_DESSIN_LONGUEUR, 0} ;
+	Point p_palette1 = {XP1, YP1}, p_palette2 = {XP2, YP2} ;
+	Point p_txtP1 = {XP1 - 110, YP1 + 32}, p_txtP2 = {XP2 - 180, YP2 + 32} ;
+
 	fill (navajowhite) ;
 	dessiner_rectangle(p_coin0, ZONE_DESSIN_LONGUEUR, TAB_HAUT, gris) ;
 	dessiner_rectangle(p_coin1, ZONE_DESSIN_LONGUEUR, ZONE_DESSIN_LARGEUR, blanc) ;
 	dessiner_rectangle(p_coin2, TAB_DROITE, TAB_HAUT, rouge) ;
-
+	
+	afficher_texte("Couleur trait :", 15, p_txtP1, khaki) ;
 	afficher_image("images/roue_chromatique.bmp", p_palette1) ;
+	afficher_texte("Couleur remplissage :", 15, p_txtP2, khaki) ;
 	afficher_image("images/roue_chromatique.bmp", p_palette2) ;
 	}
 
@@ -245,7 +256,10 @@ void dessinBoutons(void)
 	bouton(XB6, YB6, 50, 50, violet, violetlight, (int)CERCLE_PLEIN) ;
 	dessiner_disque (p_cercleP, 15, C_couleurTrait) ;
 	dessiner_disque (p_cercleP, 14, C_couleurRemp) ;	
-
+	
+	/*RECTANGLE_RAYE : */
+	bouton(XB8, YB8, 50, 50, violet, violetlight, (int)RECTANGLE_RAYE) ;
+	
 	/*REMPLISSAGE : */
 	bouton(XB7, YB7, 66, 66, violet, violetlight, (int)REMPLISSAGE) ;
 	}
@@ -256,25 +270,34 @@ void gestionOutils(void)
 	switch (i_outil)
 		{
 		case (int)SEGMENT :
-			//afficherAide("Ceci est un segment", 20) ;
+			afficherAide("Choissisez 2 points pour dessiner un segment", 20) ;
 			segment() ;
 			break ;		
 		case (int)RECTANGLE_VIDE :
+			afficherAide("Choissisez 2 points pour dessiner un rectangle vide", 20) ;
 			rectangleVide() ;
 			break ;
 		case (int)CERCLE_VIDE :
+			afficherAide("Choissisez 2 points, le premier definira le centre, le deuxieme definira le rayon", 20) ;
 			cercleVide() ;
 			break ;
 		case (int)POLYGONE_VIDE :
+			afficherAide("Le clic gauche definit les sommets, le clic droit permet de fermer le polygone", 20) ;
 			polygoneVide() ;
 			break ;
 		case (int)RECTANGLE_PLEIN :
+			afficherAide("Choissisez 2 points pour dessiner un rectangle plein", 20) ;
 			rectanglePlein() ;
 			break ;
 		case (int)CERCLE_PLEIN:
+			afficherAide("Choissisez 2 points, le premier definira le centre, le deuxieme definira le rayon", 20) ;
 			cerclePlein() ;
 			break ;
+		case (int)RECTANGLE_RAYE:
+			rectangleRaye() ;
+			break ;
 		case (int)REMPLISSAGE:
+			afficherAide("Appuyez n'importe ou dans la zone de dessin, et votre forme se remplira de la couleur de remplissage", 18) ;
 			clic = attendre_clic() ;
 			Couleur ac = couleur_point (clic), nc = C_couleurRemp;
 			remplissage(clic.x, clic.y, ac, nc) ;
@@ -295,9 +318,10 @@ void afficherAide(char *aide, int taille)
 	{
 	Point p_coin = {0,TAB_HAUT} ;
 	dessiner_rectangle(p_coin, ZONE_DESSIN_LONGUEUR, 50, noir) ;
-	//afficher_texte(aide, taille, p_coin, blanc) ;
-	actualiser () ;
+	afficher_texte(aide, taille, p_coin, blanc) ;
+	actualiser() ;
 	}
+
 int dansDessin(Point P_point)
 	{
 	if (P_point.x < 0)
@@ -345,7 +369,7 @@ void rectangleVide (void)
 	p_p4.x = p_p1.x ;
 	p_p4.y = p_p2.y ;
 	
-	if (dansDessin(p_p1) == 1 && dansDessin(p_p2) == 1 && dansDessin(p_p3) == 1 && dansDessin(p_p4) == 1)
+	if (dansDessin(p_p1) == 1 && dansDessin(p_p2) == 1)
 		{
 		dessiner_ligne(p_p1, p_p3, C_couleurTrait) ;
 		dessiner_ligne(p_p1, p_p4, C_couleurTrait) ;
@@ -452,5 +476,41 @@ void cerclePlein(void)
 		dessiner_disque (p_p1, rayon, C_couleurTrait) ;
 		dessiner_disque (p_p1, rayon - 2, C_couleurRemp) ;
 		}
+	i_outil = -1 ;
+	}
+
+void rectangleRaye(void)
+	{
+	Point p_p1, p_p2, p_p3, p_p4, p_r1, p_r2 ;
+	p_p1 = attendre_clic() ;
+	p_p2 = attendre_clic() ;
+	
+	int i_longueur = abs(p_p2.x - p_p1.x) ;
+
+	p_p3.x = p_p2.x ;
+	p_p3.y = p_p1.y ;
+	p_p4.x = p_p1.x ;
+	p_p4.y = p_p2.y ;
+	
+
+	p_r1.y = p_p1.y ;
+	p_r2.y = p_p2.y ;
+
+	if (dansDessin(p_p1) == 1 && dansDessin(p_p2) == 1)
+		{
+		dessiner_ligne(p_p1, p_p3, C_couleurTrait) ;
+		dessiner_ligne(p_p1, p_p4, C_couleurTrait) ;
+		dessiner_ligne(p_p2, p_p4, C_couleurTrait) ;
+		dessiner_ligne(p_p3, p_p2, C_couleurTrait) ;
+		}
+
+	for (int iX = p_p1.x; iX < i_longueur; iX += 20)
+		{
+		p_r1.x = iX ;
+		p_r2.x = iX ;
+		
+		dessiner_ligne (p_r1, p_r2, C_couleurRemp) ;
+		}
+
 	i_outil = -1 ;
 	}
