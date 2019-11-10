@@ -1,18 +1,24 @@
+/* Directives de preprocesseur*/
+
 #include "lib/libgraphique.h"
 #include<stdio.h>
 #include<math.h>
 
-// Définition des variables constantes
+/* Constantes de préprocesseur */
 
+/* Dimensions de la fenetre */
 #define L_FENETRE 1200
 #define H_FENETRE 700
 
+/* Dimensions de la zone consacree au dessin */
 #define ZONE_DESSIN_LONGUEUR 1000
 #define ZONE_DESSIN_LARGEUR 800
 
+/* Dimensions des differents onglets */
 #define TAB_HAUT 100
 #define TAB_DROITE 400
 
+/* Positions (x;y) des boutons */
 #define XB1 1050
 #define YB1 170
 #define XB2 1050 
@@ -28,16 +34,17 @@
 #define XB7 1050
 #define YB7 450
 
+/* Positions (x;y) des palettes de couleurs */
 #define XP1 790
 #define YP1 5
 #define XP2 900
 #define YP2 5
 
-/* Prototypes pour les fonctions */
+/* Prototypes des fonctions */
 
 void bouton(int x, int y, int l, int h, Couleur cb, Couleur cs, int i_outilSelect) ;
 void afficherAide(char *aide, int taille) ;
-int dansDessin(Point P_posSouris) ;
+int dansDessin(Point P_point) ;
 void fill (Couleur couleur) ;
 void gestionCouleurs(void) ;
 void initialisation(void) ;
@@ -56,19 +63,22 @@ void polygoneVide(void) ;
 void rectanglePlein(void) ;
 void cerclePlein(void) ;
 
-// Déclaration des variables globales
+void remplissage(int x, int y, Couleur ac, Couleur nc) ;
+/* Déclaration et initialistion des variables globales */
 
-static Couleur C_couleurTrait = blanc;
+static Couleur C_couleurTrait = blanc; 
 static Couleur C_couleurRemp = blanc;
 static Point P_posSouris ;
-static int i_outil = -1 ;
+static int i_outil = -1 ; // Correspond à l'outil selectionné
 static Point P_clic ;
 static int b_esc ;
 static int b_clicGauche ;
 
+/* Déclaration des nouveaux types */
+
 typedef enum
 	{
-	GOMME = 0,
+	REMPLISSAGE = 0,
 	SEGMENT,
 	RECTANGLE_VIDE,
 	CERCLE_VIDE,
@@ -76,8 +86,6 @@ typedef enum
 	RECTANGLE_PLEIN,
 	CERCLE_PLEIN
 	} i_outils ;
-
-// Main
 
 int main(int argc, char *argv[])
 	{
@@ -218,7 +226,7 @@ void dessinBoutons(void)
 
 	/*CERCLE_VIDE : */
 	bouton(XB3, YB3, 50, 50, violet, violetlight, (int)CERCLE_VIDE) ;
-	dessiner_disque (p_cercleV, 15, C_couleurTrait) ;
+	dessiner_cercle (p_cercleV, 15, C_couleurTrait) ;
 
 	/*POLYGONE_VIDE : */
 	bouton(XB4, YB4, 50, 50, violet, violetlight, (int)POLYGONE_VIDE) ;
@@ -238,16 +246,17 @@ void dessinBoutons(void)
 	dessiner_disque (p_cercleP, 15, C_couleurTrait) ;
 	dessiner_disque (p_cercleP, 14, C_couleurRemp) ;	
 
-	/*GOMME : */
-	bouton(XB7, YB7, 66, 66, violet, violetlight, (int)GOMME) ;
+	/*REMPLISSAGE : */
+	bouton(XB7, YB7, 66, 66, violet, violetlight, (int)REMPLISSAGE) ;
 	}
 
 void gestionOutils(void)
 	{
+	Point clic ;
 	switch (i_outil)
 		{
 		case (int)SEGMENT :
-			afficherAide("Ceci est un segment", 20) ;
+			//afficherAide("Ceci est un segment", 20) ;
 			segment() ;
 			break ;		
 		case (int)RECTANGLE_VIDE :
@@ -265,8 +274,11 @@ void gestionOutils(void)
 		case (int)CERCLE_PLEIN:
 			cerclePlein() ;
 			break ;
-		case (int)GOMME:
-			gomme() ;
+		case (int)REMPLISSAGE:
+			clic = attendre_clic() ;
+			Couleur ac = couleur_point (clic), nc = C_couleurRemp;
+			remplissage(clic.x, clic.y, ac, nc) ;
+			i_outil = -1 ;
 			break ;
 		}
 	}
@@ -286,29 +298,31 @@ void afficherAide(char *aide, int taille)
 	//afficher_texte(aide, taille, p_coin, blanc) ;
 	actualiser () ;
 	}
-int dansDessin(Point P_posSouris)
+int dansDessin(Point P_point)
 	{
-	if (P_posSouris.x < 0)
+	if (P_point.x < 0)
 		{
-		P_posSouris.x = -P_posSouris.x ;
-		P_posSouris.y = -P_posSouris.y ;
+		P_point.x = -P_point.x ;
+		P_point.y = -P_point.y ;
 		}	
-	if (P_posSouris.x >= 0 && P_posSouris.x <= ZONE_DESSIN_LONGUEUR && P_posSouris.y >= (TAB_HAUT + 50) && P_posSouris.y <= ZONE_DESSIN_LARGEUR)
+	if (P_point.x >= 0 && P_point.x <= ZONE_DESSIN_LONGUEUR && P_point.y >= (TAB_HAUT + 50) && P_point.y <= H_FENETRE)
 		return 1 ;
 	else
 		return 0 ;
 	}
 
-void gomme (void)
+void remplissage (int x, int y, Couleur ac, Couleur nc)
 	{
-	if (b_esc == 1)
-		i_outil = -1 ;
-	else 
-		{
-		if (dansDessin(P_posSouris) == 1 && P_clic.x != -1)
-			dessiner_rectangle(P_posSouris, 10, 10, blanc) ;
-			
-		}
+	Point p = {x, y} ;
+	if( couleur_point (p) != ac || dansDessin(p) == 0)
+		return ;
+
+	changer_pixel(p, nc);
+
+	remplissage(x+1, y, ac, nc);
+	remplissage(x-1, y, ac, nc);
+	remplissage(x, y+1, ac, nc);
+	remplissage(x, y-1, ac, nc);
 	}
 
 void segment (void)
@@ -343,7 +357,17 @@ void rectangleVide (void)
 
 void cercleVide(void)
 	{
+	Point p_p1 = attendre_clic() ;
+	Point p_p2 = attendre_clic() ;
 
+	int rayon = sqrt(pow((p_p2.x - p_p1.x),2) + pow((p_p2.y - p_p1.y),2)) ;
+
+	Point p_limiteHaut = {p_p1.x, p_p1.y - rayon}, p_limiteBas = {p_p1.x, p_p1.y + rayon} ;
+	Point p_limiteDroite = {p_p1.x + rayon, p_p1.y}, p_limiteGauche = {p_p1.x - rayon, p_p1.y} ;
+	if (dansDessin(p_limiteHaut) == 1 && dansDessin(p_limiteBas) == 1 && dansDessin(p_limiteDroite) == 1 && dansDessin(p_limiteGauche) == 1)
+		dessiner_cercle (p_p1, rayon, C_couleurTrait) ;
+
+	i_outil = -1 ;
 	}
 
 void polygoneVide(void)
@@ -413,15 +437,20 @@ void rectanglePlein(void)
 		}
 	i_outil = -1 ;
 	}
+
 void cerclePlein(void)
 	{
 	Point p_p1 = attendre_clic() ;
 	Point p_p2 = attendre_clic() ;
 
 	int rayon = sqrt(pow((p_p2.x - p_p1.x),2) + pow((p_p2.y - p_p1.y),2)) ;
-
-	dessiner_disque (p_p1, rayon, C_couleurTrait) ;
-	dessiner_disque (p_p1, rayon - 2, C_couleurRemp) ;
-
+	
+	Point p_limiteHaut = {p_p1.x, p_p1.y - rayon}, p_limiteBas = {p_p1.x, p_p1.y + rayon} ;
+	Point p_limiteDroite = {p_p1.x + rayon, p_p1.y}, p_limiteGauche = {p_p1.x - rayon, p_p1.y} ;
+	if (dansDessin(p_limiteHaut) == 1 && dansDessin(p_limiteBas) == 1 && dansDessin(p_limiteDroite) == 1 && dansDessin(p_limiteGauche) == 1)
+		{	
+		dessiner_disque (p_p1, rayon, C_couleurTrait) ;
+		dessiner_disque (p_p1, rayon - 2, C_couleurRemp) ;
+		}
 	i_outil = -1 ;
 	}
