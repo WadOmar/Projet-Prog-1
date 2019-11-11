@@ -11,30 +11,30 @@
 #define H_FENETRE 700
 
 /* Dimensions de la zone consacree au dessin */
-#define ZONE_DESSIN_LONGUEUR 1000
-#define ZONE_DESSIN_LARGEUR 800
+#define L_DESSIN 1000
+#define H_DESSIN 800
 
 /* Dimensions des differents onglets */
 #define TAB_HAUT 100
 #define TAB_DROITE 400
 
 /* Positions (x;y) des boutons */
-#define XB1 1050
-#define YB1 170
-#define XB2 1010 
-#define YB2 240
-#define XB3 1050
-#define YB3 310
-#define XB4 1100
-#define YB4 170
-#define XB5 1060
-#define YB5 240
-#define XB6 1060
-#define YB6 310
-#define XB7 1100
-#define YB7 450
-#define XB8 1110
-#define YB8 240
+#define X_B_SEGMENT 1050
+#define Y_B_SEGMENT 170
+#define X_B_RECT_V 1010 
+#define Y_B_RECT_V 240
+#define X_B_RECT_P 1060
+#define Y_B_RECT_P 240
+#define X_B_RECT_R 1110
+#define Y_B_RECT_R 240
+#define X_B_CERCLE_V 1050
+#define Y_B_CERCLE_V 310
+#define X_B_CERCLE_P 1060
+#define Y_B_CERCLE_P 310
+#define X_B_POLY_V 1100
+#define Y_B_POLY_V 170
+#define X_B_REMPL 1100
+#define Y_B_REMPL 450
 
 /* Positions (x;y) des palettes de couleurs */
 #define XP1 600
@@ -70,8 +70,8 @@ void remplissage(int x, int y, Couleur ac, Couleur nc) ;
 
 /* Déclaration et initialistion des variables globales */
 
-static Couleur C_couleurTrait = blanc; 
-static Couleur C_couleurRemp = blanc;
+static Couleur C_couleurTrait = noir; 
+static Couleur C_couleurRemp = noir;
 static Point P_posSouris ;
 static int i_outil = -1 ; // Correspond à l'outil selectionné
 static Point P_clic ;
@@ -128,17 +128,17 @@ int main(int argc, char *argv[])
 
 void fill(Couleur couleur)
 	{
-	Point p_coin = {0,0} ;
-	dessiner_rectangle (p_coin, L_FENETRE, H_FENETRE, couleur) ;
+	Point P_coin = {0,0} ;
+	dessiner_rectangle (P_coin, L_FENETRE, H_FENETRE, couleur) ;
 	}
 
 void bouton(int x, int y, int l, int h, Couleur cb, Couleur cs, int i_outilSelect)
 	{
-	Point p_coin = {x, y};
+	Point P_coin = {x, y};
 
-	if (P_posSouris.x > p_coin.x && P_posSouris.x < p_coin.x + l && P_posSouris.y > p_coin.y && P_posSouris.y < p_coin.y + h)
+	if (P_posSouris.x > P_coin.x && P_posSouris.x < P_coin.x + l && P_posSouris.y > P_coin.y && P_posSouris.y < P_coin.y + h)
 		{
-		dessiner_rectangle(p_coin, l, h, cs) ;
+		dessiner_rectangle(P_coin, l, h, cs) ;
 		
 		if (P_clic.x != -1 && P_clic.y != -1)
 			{
@@ -149,28 +149,47 @@ void bouton(int x, int y, int l, int h, Couleur cb, Couleur cs, int i_outilSelec
 			}
 		}
 	else 
-		dessiner_rectangle(p_coin, l, h, cb) ;
+		dessiner_rectangle(P_coin, l, h, cb) ;
 	
 	}
 
 void chargement(void)
 	{
 	int i_progression = 0 ;
+
+	Point P_milieu = {L_FENETRE/2 - 250, H_FENETRE/2} ;
+	Point P_chargement = {P_milieu.x + 150, P_milieu.y + 20} ;
+	Point P_logo = {P_milieu.x + 250, P_milieu.y + 130} ;
 	
-	Point p_milieu = {L_FENETRE/2 - 250, H_FENETRE/2} ;
-	Point p_logo = {p_milieu.x + 250, p_milieu.y + 130} ;
-	Point p_chargement = {p_milieu.x + 150, p_milieu.y + 20} , p_fake = {p_chargement.x, p_chargement.y + 50};
 	fill(noir) ;
-	afficher_texte("CHARGEMENT", 30, p_chargement, blanc) ;
+
+	FILE* fichier = NULL ;
+	char s_chaine[100] = "";
+	int i_ligne = entier_aleatoire(10) ;
+
+	fichier = fopen("quotes.txt", "r+") ;
+
+	if (fichier != NULL)
+		{
+		for (int iLigne = 0; iLigne < i_ligne; iLigne++) // On lit le fichier tant qu'on ne reçoit pas d'erreur (NULL)
+			fgets(s_chaine, 100, fichier) ;
+
+		fclose(fichier) ;
+		}
+
+	Point P_quote = {L_FENETRE/2 - (taille_texte(s_chaine, 30).x)/2, P_chargement.y + 50};
+	Point taille_texte(char *texte, int taille);
+
+	afficher_texte(s_chaine, 30, P_quote, jaune) ;
+	afficher_texte("CHARGEMENT", 30, P_chargement, blanc) ;
+
 	while (i_progression < 500)
 		{
-		afficher_image("images/logoCpaint.bmp", p_logo) ;
-		dessiner_rectangle(p_milieu, i_progression, 20, rouge) ;
+		afficher_image("images/logoCpaint.bmp", P_logo) ;
+		dessiner_rectangle(P_milieu, i_progression, 20, rouge) ;
 		actualiser() ;
 		i_progression ++ ;
 		attente(3) ;
-		if (i_progression == 250)
-			afficher_texte("C'est faux (:", 30, p_fake, palegreen) ;
 		}
 	}
 
@@ -190,19 +209,19 @@ void menu(void)
 
 void initialisation(void)
 	{
-	Point p_coin0 = {0,0}, p_coin1 = {0,150}, p_coin2 = {ZONE_DESSIN_LONGUEUR, 0} ;
-	Point p_palette1 = {XP1, YP1}, p_palette2 = {XP2, YP2} ;
-	Point p_txtP1 = {XP1 - 110, YP1 + 32}, p_txtP2 = {XP2 - 180, YP2 + 32} ;
+	Point P_coin0 = {0,0}, P_coin1 = {0,150}, P_coin2 = {L_DESSIN, 0} ;
+	Point P_palette1 = {XP1, YP1}, P_palette2 = {XP2, YP2} ;
+	Point P_txtP1 = {XP1 - 110, YP1 + 32}, P_txtP2 = {XP2 - 180, YP2 + 32} ;
 
 	fill (navajowhite) ;
-	dessiner_rectangle(p_coin0, ZONE_DESSIN_LONGUEUR, TAB_HAUT, gris) ;
-	dessiner_rectangle(p_coin1, ZONE_DESSIN_LONGUEUR, ZONE_DESSIN_LARGEUR, blanc) ;
-	dessiner_rectangle(p_coin2, TAB_DROITE, TAB_HAUT, rouge) ;
+	dessiner_rectangle(P_coin0, L_DESSIN, TAB_HAUT, gris) ;
+	dessiner_rectangle(P_coin1, L_DESSIN, H_DESSIN, blanc) ;
+	dessiner_rectangle(P_coin2, TAB_DROITE, TAB_HAUT, rouge) ;
 	
-	afficher_texte("Couleur trait :", 15, p_txtP1, khaki) ;
-	afficher_image("images/roue_chromatique.bmp", p_palette1) ;
-	afficher_texte("Couleur remplissage :", 15, p_txtP2, khaki) ;
-	afficher_image("images/roue_chromatique.bmp", p_palette2) ;
+	afficher_texte("Couleur trait :", 15, P_txtP1, khaki) ;
+	afficher_image("images/roue_chromatique.bmp", P_palette1) ;
+	afficher_texte("Couleur remplissage :", 15, P_txtP2, khaki) ;
+	afficher_image("images/roue_chromatique.bmp", P_palette2) ;
 	}
 
 void affichage(void)
@@ -213,55 +232,57 @@ void affichage(void)
 
 void dessinBoutons(void)
 	{
-	Point p_rect1 = {XB2 + 5, YB2 + 12}, p_rect2 =  {XB2 + 45, YB2 + 12}, p_rect3 = {XB2 + 45, YB2 + 38}, p_rect4 = {XB2 + 5, YB2 + 38} ;
-	Point p_pol1 = {XB4 + 15, YB4 + 10}, p_pol2 =  {XB4 + 30, YB4 + 12}, p_pol3 = {XB4 + 40, YB4 + 25} ;
-	Point p_pol4 =  {XB4 + 25, YB4 + 40}, p_pol5 = {XB4 + 13, YB4 + 35} ;
-	Point p_seg1 = {XB1 + 10, YB1 + 10}, p_seg2 =  {XB1 + 30, YB1 + 40} ;
-	Point p_cercleV = {XB3 + 25, YB3 + 25} ;
-	Point p_rectP1 = {XB5 + 5, YB5 + 12}, p_rectP2 = {p_rectP1.x + 1, p_rectP1.y + 1} ;
-	Point p_cercleP = {XB6 + 25, YB6 + 25} ;
+	Point P_rect1 = {X_B_RECT_V + 5, Y_B_RECT_V + 12}, P_rect2 =  {X_B_RECT_V + 45, Y_B_RECT_V + 12} ;
+	Point P_rect3 = {X_B_RECT_V + 45, Y_B_RECT_V + 38}, P_rect4 = {X_B_RECT_V + 5, Y_B_RECT_V + 38} ;
+	Point P_pol1 = {X_B_POLY_V + 15, Y_B_POLY_V + 10}, P_pol2 =  {X_B_POLY_V + 30, Y_B_POLY_V + 12} ;
+	Point P_pol3 = {X_B_POLY_V + 40, Y_B_POLY_V + 25}, P_pol4 =  {X_B_POLY_V + 25, Y_B_POLY_V + 40} ;
+	Point P_pol5 = {X_B_POLY_V + 13, Y_B_POLY_V + 35} ;
+	Point P_seg1 = {X_B_SEGMENT + 10, Y_B_SEGMENT + 10}, P_seg2 =  {X_B_SEGMENT + 30, Y_B_SEGMENT + 40} ;
+	Point P_cercleV = {X_B_CERCLE_V + 25, Y_B_CERCLE_V + 25} ;
+	Point P_rectP1 = {X_B_RECT_P + 5, Y_B_RECT_P + 12}, P_rectP2 = {P_rectP1.x + 1, P_rectP1.y + 1} ;
+	Point P_cercleP = {X_B_CERCLE_P + 25, Y_B_CERCLE_P + 25} ;
 
 	/*CLEAR : */
-	bouton(ZONE_DESSIN_LONGUEUR, 0, TAB_DROITE, TAB_HAUT, darkred, red, 666) ;	
+	bouton(L_DESSIN, 0, TAB_DROITE, TAB_HAUT, darkred, red, 666) ;	
 
 	/*SEGMENT : */
-	bouton(XB1, YB1, 50, 50, violet, violetlight, (int)SEGMENT) ;
-	dessiner_ligne (p_seg1, p_seg2, C_couleurTrait) ;
+	bouton(X_B_SEGMENT, Y_B_SEGMENT, 50, 50, violet, violetlight, (int)SEGMENT) ;
+	dessiner_ligne (P_seg1, P_seg2, C_couleurTrait) ;
 	
 	/*RECTANGLE_VIDE : */
-	bouton(XB2, YB2, 50, 50, violet, violetlight, (int)RECTANGLE_VIDE) ;
-	dessiner_ligne (p_rect1, p_rect2, C_couleurTrait) ;
-	dessiner_ligne (p_rect2, p_rect3, C_couleurTrait) ;
-	dessiner_ligne (p_rect3, p_rect4, C_couleurTrait) ;
-	dessiner_ligne (p_rect4, p_rect1, C_couleurTrait) ;
+	bouton(X_B_RECT_V, Y_B_RECT_V, 50, 50, violet, violetlight, (int)RECTANGLE_VIDE) ;
+	dessiner_ligne (P_rect1, P_rect2, C_couleurTrait) ;
+	dessiner_ligne (P_rect2, P_rect3, C_couleurTrait) ;
+	dessiner_ligne (P_rect3, P_rect4, C_couleurTrait) ;
+	dessiner_ligne (P_rect4, P_rect1, C_couleurTrait) ;
 
 	/*CERCLE_VIDE : */
-	bouton(XB3, YB3, 50, 50, violet, violetlight, (int)CERCLE_VIDE) ;
-	dessiner_cercle (p_cercleV, 15, C_couleurTrait) ;
+	bouton(X_B_CERCLE_V, Y_B_CERCLE_V, 50, 50, violet, violetlight, (int)CERCLE_VIDE) ;
+	dessiner_cercle (P_cercleV, 15, C_couleurTrait) ;
 
 	/*POLYGONE_VIDE : */
-	bouton(XB4, YB4, 50, 50, violet, violetlight, (int)POLYGONE_VIDE) ;
-	dessiner_ligne (p_pol1, p_pol2, C_couleurTrait) ;
-	dessiner_ligne (p_pol2, p_pol3, C_couleurTrait) ;
-	dessiner_ligne (p_pol3, p_pol4, C_couleurTrait) ;
-	dessiner_ligne (p_pol4, p_pol5, C_couleurTrait) ;
-	dessiner_ligne (p_pol5, p_pol1, C_couleurTrait) ;
+	bouton(X_B_POLY_V, Y_B_POLY_V, 50, 50, violet, violetlight, (int)POLYGONE_VIDE) ;
+	dessiner_ligne (P_pol1, P_pol2, C_couleurTrait) ;
+	dessiner_ligne (P_pol2, P_pol3, C_couleurTrait) ;
+	dessiner_ligne (P_pol3, P_pol4, C_couleurTrait) ;
+	dessiner_ligne (P_pol4, P_pol5, C_couleurTrait) ;
+	dessiner_ligne (P_pol5, P_pol1, C_couleurTrait) ;
 
 	/*RECTANGLE_PLEIN : */
-	bouton(XB5, YB5, 50, 50, violet, violetlight, (int)RECTANGLE_PLEIN) ;
-	dessiner_rectangle(p_rectP1, 40, 26, C_couleurTrait) ;
-	dessiner_rectangle(p_rectP2, 38, 24, C_couleurRemp) ;
+	bouton(X_B_RECT_P, Y_B_RECT_P, 50, 50, violet, violetlight, (int)RECTANGLE_PLEIN) ;
+	dessiner_rectangle(P_rectP1, 40, 26, C_couleurTrait) ;
+	dessiner_rectangle(P_rectP2, 38, 24, C_couleurRemp) ;
 
 	/*CERCLE_PLEIN : */
-	bouton(XB6, YB6, 50, 50, violet, violetlight, (int)CERCLE_PLEIN) ;
-	dessiner_disque (p_cercleP, 15, C_couleurTrait) ;
-	dessiner_disque (p_cercleP, 14, C_couleurRemp) ;	
+	bouton(X_B_CERCLE_P, Y_B_CERCLE_P, 50, 50, violet, violetlight, (int)CERCLE_PLEIN) ;
+	dessiner_disque (P_cercleP, 15, C_couleurTrait) ;
+	dessiner_disque (P_cercleP, 14, C_couleurRemp) ;	
 	
 	/*RECTANGLE_RAYE : */
-	bouton(XB8, YB8, 50, 50, violet, violetlight, (int)RECTANGLE_RAYE) ;
+	bouton(X_B_RECT_R, Y_B_RECT_R, 50, 50, violet, violetlight, (int)RECTANGLE_RAYE) ;
 	
 	/*REMPLISSAGE : */
-	bouton(XB7, YB7, 66, 66, violet, violetlight, (int)REMPLISSAGE) ;
+	bouton(X_B_REMPL, Y_B_REMPL, 66, 66, violet, violetlight, (int)REMPLISSAGE) ;
 	}
 
 void gestionOutils(void)
@@ -316,9 +337,9 @@ void gestionCouleurs (void)
 
 void afficherAide(char *aide, int taille)
 	{
-	Point p_coin = {0,TAB_HAUT} ;
-	dessiner_rectangle(p_coin, ZONE_DESSIN_LONGUEUR, 50, noir) ;
-	afficher_texte(aide, taille, p_coin, blanc) ;
+	Point P_coin = {0,TAB_HAUT} ;
+	dessiner_rectangle(P_coin, L_DESSIN, 50, noir) ;
+	afficher_texte(aide, taille, P_coin, blanc) ;
 	actualiser() ;
 	}
 
@@ -329,7 +350,7 @@ int dansDessin(Point P_point)
 		P_point.x = -P_point.x ;
 		P_point.y = -P_point.y ;
 		}	
-	if (P_point.x >= 0 && P_point.x <= ZONE_DESSIN_LONGUEUR && P_point.y >= (TAB_HAUT + 50) && P_point.y <= H_FENETRE)
+	if (P_point.x >= 0 && P_point.x <= L_DESSIN && P_point.y >= (TAB_HAUT + 50) && P_point.y <= H_FENETRE)
 		return 1 ;
 	else
 		return 0 ;
@@ -351,80 +372,80 @@ void remplissage (int x, int y, Couleur ac, Couleur nc)
 
 void segment (void)
 	{
-	Point p_p1, p_p2 ;	
-	p_p1 = attendre_clic() ;
-	p_p2 = attendre_clic() ;
-	if (dansDessin(p_p1) == 1 && dansDessin(p_p2) == 1)
-		dessiner_ligne(p_p1,p_p2, C_couleurTrait) ;
+	Point P_p1, P_p2 ;	
+	P_p1 = attendre_clic() ;
+	P_p2 = attendre_clic() ;
+	if (dansDessin(P_p1) == 1 && dansDessin(P_p2) == 1)
+		dessiner_ligne(P_p1,P_p2, C_couleurTrait) ;
 	i_outil = -1 ;
 	}
 
 void rectangleVide (void)
 	{
-	Point p_p1, p_p2, p_p3, p_p4 ;
-	p_p1 = attendre_clic() ;
-	p_p2 = attendre_clic() ;
-	p_p3.x = p_p2.x ;
-	p_p3.y = p_p1.y ;
-	p_p4.x = p_p1.x ;
-	p_p4.y = p_p2.y ;
+	Point P_p1, P_p2, P_p3, P_p4 ;
+	P_p1 = attendre_clic() ;
+	P_p2 = attendre_clic() ;
+	P_p3.x = P_p2.x ;
+	P_p3.y = P_p1.y ;
+	P_p4.x = P_p1.x ;
+	P_p4.y = P_p2.y ;
 	
-	if (dansDessin(p_p1) == 1 && dansDessin(p_p2) == 1)
+	if (dansDessin(P_p1) == 1 && dansDessin(P_p2) == 1)
 		{
-		dessiner_ligne(p_p1, p_p3, C_couleurTrait) ;
-		dessiner_ligne(p_p1, p_p4, C_couleurTrait) ;
-		dessiner_ligne(p_p2, p_p4, C_couleurTrait) ;
-		dessiner_ligne(p_p3, p_p2, C_couleurTrait) ;
+		dessiner_ligne(P_p1, P_p3, C_couleurTrait) ;
+		dessiner_ligne(P_p1, P_p4, C_couleurTrait) ;
+		dessiner_ligne(P_p2, P_p4, C_couleurTrait) ;
+		dessiner_ligne(P_p3, P_p2, C_couleurTrait) ;
 		}
 	i_outil = -1 ;
 	}
 
 void cercleVide(void)
 	{
-	Point p_p1 = attendre_clic() ;
-	Point p_p2 = attendre_clic() ;
+	Point P_p1 = attendre_clic() ;
+	Point P_p2 = attendre_clic() ;
 
-	int rayon = sqrt(pow((p_p2.x - p_p1.x),2) + pow((p_p2.y - p_p1.y),2)) ;
+	int rayon = sqrt(pow((P_p2.x - P_p1.x),2) + pow((P_p2.y - P_p1.y),2)) ;
 
-	Point p_limiteHaut = {p_p1.x, p_p1.y - rayon}, p_limiteBas = {p_p1.x, p_p1.y + rayon} ;
-	Point p_limiteDroite = {p_p1.x + rayon, p_p1.y}, p_limiteGauche = {p_p1.x - rayon, p_p1.y} ;
-	if (dansDessin(p_limiteHaut) == 1 && dansDessin(p_limiteBas) == 1 && dansDessin(p_limiteDroite) == 1 && dansDessin(p_limiteGauche) == 1)
-		dessiner_cercle (p_p1, rayon, C_couleurTrait) ;
+	Point P_limiteHaut = {P_p1.x, P_p1.y - rayon}, P_limiteBas = {P_p1.x, P_p1.y + rayon} ;
+	Point P_limiteDroite = {P_p1.x + rayon, P_p1.y}, P_limiteGauche = {P_p1.x - rayon, P_p1.y} ;
+	if (dansDessin(P_limiteHaut) == 1 && dansDessin(P_limiteBas) == 1 && dansDessin(P_limiteDroite) == 1 && dansDessin(P_limiteGauche) == 1)
+		dessiner_cercle (P_p1, rayon, C_couleurTrait) ;
 
 	i_outil = -1 ;
 	}
 
 void polygoneVide(void)
 	{
-	Point p_p1, p_p2, p_p3 ;
-	int p_clicDroit = 0 ;
+	Point P_p1, P_p2, P_p3 ;
+	int P_clicDroit = 0 ;
 	
-	p_p1 = attendre_clic_gauche_droite() ;
-	p_p2 = attendre_clic_gauche_droite() ;
+	P_p1 = attendre_clic_gauche_droite() ;
+	P_p2 = attendre_clic_gauche_droite() ;
 	
-	if (dansDessin(p_p1) == 1 && dansDessin(p_p2) == 1)
+	if (dansDessin(P_p1) == 1 && dansDessin(P_p2) == 1)
 		{
-		dessiner_ligne(p_p1, p_p2, C_couleurTrait) ;
+		dessiner_ligne(P_p1, P_p2, C_couleurTrait) ;
 		actualiser () ;
-		while (p_clicDroit == 0)
+		while (P_clicDroit == 0)
 			{
-			p_p3 = attendre_clic_gauche_droite() ;
-			if (dansDessin(p_p3) == 1)
+			P_p3 = attendre_clic_gauche_droite() ;
+			if (dansDessin(P_p3) == 1)
 				{
-				if (p_p3.x < 0)
+				if (P_p3.x < 0)
 					{
-					p_p3.x = -p_p3.x ;
-					p_p3.y = -p_p3.y ;
-					dessiner_ligne (p_p2, p_p1, C_couleurTrait) ;
-					p_clicDroit = 1 ;
+					P_p3.x = -P_p3.x ;
+					P_p3.y = -P_p3.y ;
+					dessiner_ligne (P_p2, P_p1, C_couleurTrait) ;
+					P_clicDroit = 1 ;
 					}
 				else
-					dessiner_ligne (p_p2, p_p3, C_couleurTrait) ;
+					dessiner_ligne (P_p2, P_p3, C_couleurTrait) ;
 				
 				actualiser () ;
 					
-				p_p2.x = p_p3.x ;
-				p_p2.y = p_p3.y ;
+				P_p2.x = P_p3.x ;
+				P_p2.y = P_p3.y ;
 				}
 			}
 		}
@@ -433,83 +454,83 @@ void polygoneVide(void)
 
 void rectanglePlein(void)
 	{
-	Point p_p1 = attendre_clic() ;
-	Point p_p2 = attendre_clic() ;
-	int i_largeur = abs(p_p2.x - p_p1.x), i_hauteur = abs(p_p2.y - p_p1.y) ;
-	Point p_coin ;
+	Point P_p1 = attendre_clic() ;
+	Point P_p2 = attendre_clic() ;
+	int i_largeur = abs(P_p2.x - P_p1.x), i_hauteur = abs(P_p2.y - P_p1.y) ;
+	Point P_coin ;
 
-	if (dansDessin(p_p1) == 1 && dansDessin(p_p2) == 1)	
+	if (dansDessin(P_p1) == 1 && dansDessin(P_p2) == 1)	
 		{	
-		if (p_p1.x < p_p2.x && p_p1.y < p_p2.y)		
-			p_coin = p_p1 ;
-		else if (p_p1.x < p_p2.x && p_p1.y > p_p2.y)
+		if (P_p1.x < P_p2.x && P_p1.y < P_p2.y)		
+			P_coin = P_p1 ;
+		else if (P_p1.x < P_p2.x && P_p1.y > P_p2.y)
 			{
-			p_coin.x = p_p1.x ;
-			p_coin.y = p_p2.y ;
+			P_coin.x = P_p1.x ;
+			P_coin.y = P_p2.y ;
 			}
-		else if (p_p1.x > p_p2.x && p_p1.y < p_p2.y)
+		else if (P_p1.x > P_p2.x && P_p1.y < P_p2.y)
 			{
-			p_coin.x = p_p2.x ;
-			p_coin.y = p_p1.y ;
+			P_coin.x = P_p2.x ;
+			P_coin.y = P_p1.y ;
 			}
 		else 
-			p_coin = p_p2 ;
+			P_coin = P_p2 ;
 
-		Point p_coinInt = {p_coin.x + 2, p_coin.y + 2} ;
-		dessiner_rectangle (p_coin, i_largeur, i_hauteur, C_couleurTrait) ;
-		dessiner_rectangle (p_coinInt, i_largeur - 4, i_hauteur - 4, C_couleurRemp) ;		
+		Point P_coinInt = {P_coin.x + 2, P_coin.y + 2} ;
+		dessiner_rectangle (P_coin, i_largeur, i_hauteur, C_couleurTrait) ;
+		dessiner_rectangle (P_coinInt, i_largeur - 4, i_hauteur - 4, C_couleurRemp) ;		
 		}
 	i_outil = -1 ;
 	}
 
 void cerclePlein(void)
 	{
-	Point p_p1 = attendre_clic() ;
-	Point p_p2 = attendre_clic() ;
+	Point P_p1 = attendre_clic() ;
+	Point P_p2 = attendre_clic() ;
 
-	int rayon = sqrt(pow((p_p2.x - p_p1.x),2) + pow((p_p2.y - p_p1.y),2)) ;
+	int rayon = sqrt(pow((P_p2.x - P_p1.x),2) + pow((P_p2.y - P_p1.y),2)) ;
 	
-	Point p_limiteHaut = {p_p1.x, p_p1.y - rayon}, p_limiteBas = {p_p1.x, p_p1.y + rayon} ;
-	Point p_limiteDroite = {p_p1.x + rayon, p_p1.y}, p_limiteGauche = {p_p1.x - rayon, p_p1.y} ;
-	if (dansDessin(p_limiteHaut) == 1 && dansDessin(p_limiteBas) == 1 && dansDessin(p_limiteDroite) == 1 && dansDessin(p_limiteGauche) == 1)
+	Point P_limiteHaut = {P_p1.x, P_p1.y - rayon}, P_limiteBas = {P_p1.x, P_p1.y + rayon} ;
+	Point P_limiteDroite = {P_p1.x + rayon, P_p1.y}, P_limiteGauche = {P_p1.x - rayon, P_p1.y} ;
+	if (dansDessin(P_limiteHaut) == 1 && dansDessin(P_limiteBas) == 1 && dansDessin(P_limiteDroite) == 1 && dansDessin(P_limiteGauche) == 1)
 		{	
-		dessiner_disque (p_p1, rayon, C_couleurTrait) ;
-		dessiner_disque (p_p1, rayon - 2, C_couleurRemp) ;
+		dessiner_disque (P_p1, rayon, C_couleurTrait) ;
+		dessiner_disque (P_p1, rayon - 2, C_couleurRemp) ;
 		}
 	i_outil = -1 ;
 	}
 
 void rectangleRaye(void)
 	{
-	Point p_p1, p_p2, p_p3, p_p4, p_r1, p_r2 ;
-	p_p1 = attendre_clic() ;
-	p_p2 = attendre_clic() ;
+	Point P_p1, P_p2, P_p3, P_p4, P_r1, P_r2 ;
+	P_p1 = attendre_clic() ;
+	P_p2 = attendre_clic() ;
 	
-	int i_longueur = abs(p_p2.x - p_p1.x) ;
+	int i_longueur = abs(P_p2.x - P_p1.x) ;
 
-	p_p3.x = p_p2.x ;
-	p_p3.y = p_p1.y ;
-	p_p4.x = p_p1.x ;
-	p_p4.y = p_p2.y ;
+	P_p3.x = P_p2.x ;
+	P_p3.y = P_p1.y ;
+	P_p4.x = P_p1.x ;
+	P_p4.y = P_p2.y ;
 	
 
-	p_r1.y = p_p1.y ;
-	p_r2.y = p_p2.y ;
+	P_r1.y = P_p1.y ;
+	P_r2.y = P_p2.y ;
 
-	if (dansDessin(p_p1) == 1 && dansDessin(p_p2) == 1)
+	if (dansDessin(P_p1) == 1 && dansDessin(P_p2) == 1)
 		{
-		dessiner_ligne(p_p1, p_p3, C_couleurTrait) ;
-		dessiner_ligne(p_p1, p_p4, C_couleurTrait) ;
-		dessiner_ligne(p_p2, p_p4, C_couleurTrait) ;
-		dessiner_ligne(p_p3, p_p2, C_couleurTrait) ;
+		dessiner_ligne(P_p1, P_p3, C_couleurTrait) ;
+		dessiner_ligne(P_p1, P_p4, C_couleurTrait) ;
+		dessiner_ligne(P_p2, P_p4, C_couleurTrait) ;
+		dessiner_ligne(P_p3, P_p2, C_couleurTrait) ;
 		}
 
-	for (int iX = p_p1.x; iX < i_longueur; iX += 20)
+	for (int iX = P_p1.x; iX < i_longueur; iX += 20)
 		{
-		p_r1.x = iX ;
-		p_r2.x = iX ;
+		P_r1.x = iX ;
+		P_r2.x = iX ;
 		
-		dessiner_ligne (p_r1, p_r2, C_couleurRemp) ;
+		dessiner_ligne (P_r1, P_r2, C_couleurRemp) ;
 		}
 
 	i_outil = -1 ;
