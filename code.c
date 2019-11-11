@@ -42,17 +42,24 @@
 #define YP2 5
 
 /* Positions (x;y) des tailles des traits */
-#define XT1 120
+#define XT1 100
 #define YT1 60
-#define XT2 145
-#define YT2 50
-#define XT3 180
-#define YT3 40
+#define XT2 170
+#define YT2 60
+#define XT3 240
+#define YT3 60
+
+/* Taille des traits */
+#define TAILLE_PETIT 0
+#define TAILLE_MOYEN 1
+#define TAILLE_GRAND 2
+
 
 /* Prototypes des fonctions */
 
 void bouton(int x, int y, int l, int h, Couleur cb, Couleur cs, int i_outilSelect) ;
 void boutonT(int x, int y, int l, int h, Couleur cb, Couleur cs) ;
+void tailleTraits(int x, int y, int i_tailleTrait) ;
 void afficherAide(char *aide, int taille) ;
 int dansDessin(Point P_point) ;
 void fill (Couleur couleur) ;
@@ -100,13 +107,6 @@ typedef enum
 	CERCLE_PLEIN,
 	RECTANGLE_RAYE
 	} i_outils ;
-
-typedef enum
-	{
-	TRAIT_PETIT = 1,
-	TRAIT_MOYEN = 3,
-	TRAIT_GRAND = 5,
-	} i_traits ;
 
 int main(int argc, char *argv[])
 	{
@@ -175,6 +175,18 @@ void boutonT(int x, int y, int l, int h, Couleur cb, Couleur cs)
 		dessiner_rectangle(p_coin, l, h, cs) ;
 	else
 		dessiner_rectangle(p_coin, l, h, cb) ;
+	}
+	
+void tailleTraits(int x, int y, int i_tailleTrait)
+	{
+	Point p_coin1 = {x , y};
+	
+	if (P_clic.x == XT1  && P_clic.y == YT1)
+		i_tailleTrait == 0;
+	else if (P_clic.x == XT2  && P_clic.y == YT2)
+		i_tailleTrait == 1;
+	else if (P_clic.x == XT3  && P_clic.y == YT3)
+		i_tailleTrait == 2;
 	}
 
 void chargement(void)
@@ -291,9 +303,9 @@ void dessinBoutons(void)
 
 void dessinBoutonsTraits(void)
 	{
-	boutonT(XT1, YT1, 25, 25, violet, violetlight);
-	boutonT(XT2, YT2, 35, 35, violet, violetlight);
-	boutonT(XT3, YT3, 45, 45, violet, violetlight);
+	boutonT(XT1, YT1, 70, 25, violet, violetlight);
+	boutonT(XT2, YT2, 70, 25, violet, violetlight);
+	boutonT(XT3, YT3, 70, 25, violet, violetlight);
 	}	
 
 void gestionOutils(void)
@@ -336,22 +348,6 @@ void gestionOutils(void)
 			i_outil = -1 ;
 			break ;
 		}
-	}
-
-void gestionTraits(void)
-	{
-	Point clic2 ;
-	switch (i_traits)
-		{
-		case (int)TRAIT_PETIT() :
-		
-			break;
-		case (int)TRAIT_MOYEN() :
-		
-			break;
-		case (int)TRAIT_GRAND() :
-			
-				break;
 	}
 
 void gestionCouleurs (void)
