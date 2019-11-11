@@ -92,7 +92,7 @@ static int i_outil = -1 ; // Correspond à l'outil selectionné
 static Point P_clic ;
 static int b_esc ;
 static int b_clicGauche ;
-static int i_tailleTrait = 1 ;
+static int i_tailleTrait ;
 
 /* Déclaration des nouveaux types */
 
@@ -399,7 +399,19 @@ void segment (void)
 	p_p1 = attendre_clic() ;
 	p_p2 = attendre_clic() ;
 	if (dansDessin(p_p1) == 1 && dansDessin(p_p2) == 1)
-		dessiner_ligne(p_p1,p_p2, C_couleurTrait) ;
+		if (i_tailleTrait == 0)
+			dessiner_ligne(p_p1,p_p2, C_couleurTrait) ;
+		else if (i_tailleTrait == 1)
+			{
+			dessiner_ligne(p_p1,p_p2, C_couleurTrait) ;
+			dessiner_ligne(p_p1 + 1,p_p2 + 1, C_couleurTrait) ;
+			}
+		else if (i_tailleTrait == 2)
+			{
+			dessiner_ligne(p_p1,p_p2, C_couleurTrait) ;
+			dessiner_ligne(p_p1 + 1,p_p2 + 1, C_couleurTrait) ;
+			dessiner_ligne(p_p1 + 2,p_p2 + 2, C_couleurTrait) ;
+			}
 	i_outil = -1 ;
 	}
 
