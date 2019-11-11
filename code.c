@@ -179,14 +179,14 @@ void boutonT(int x, int y, int l, int h, Couleur cb, Couleur cs)
 	
 void tailleTraits(int x, int y, int i_tailleTrait)
 	{
-	Point p_coin1 = {x , y};
+	Point p_clic = attendre_clic();
 	
 	if (P_clic.x == XT1  && P_clic.y == YT1)
-		i_tailleTrait == 0;
+		i_tailleTrait = TAILLE_PETIT;
 	else if (P_clic.x == XT2  && P_clic.y == YT2)
-		i_tailleTrait == 1;
+		i_tailleTrait = TAILLE_MOYEN;
 	else if (P_clic.x == XT3  && P_clic.y == YT3)
-		i_tailleTrait == 2;
+		i_tailleTrait = TAILLE_GRAND;
 	}
 
 void chargement(void)
@@ -245,6 +245,7 @@ void affichage(void)
 	{
 	dessinBoutons() ;
 	dessinBoutonsTraits() ;
+	tailleTraits() ;
 	actualiser() ;
 	}
 
@@ -398,19 +399,24 @@ void segment (void)
 	Point p_p1, p_p2 ;	
 	p_p1 = attendre_clic() ;
 	p_p2 = attendre_clic() ;
+	Point p_pp1 = { p_p1.x + 1, p_p1.y };
+	Point p_pp2 = { p_p1.x + 1, p_p2.y };
+	Point p_pp3 = { p_p1.x + 2, p_p2.y };
+	Point p_pp4 = { p_p1.x + 2, p_p2.y };
+	
 	if (dansDessin(p_p1) == 1 && dansDessin(p_p2) == 1)
-		if (i_tailleTrait == 0)
+		if (TAILLE_PETIT)
 			dessiner_ligne(p_p1,p_p2, C_couleurTrait) ;
-		else if (i_tailleTrait == 1)
+		else if (TAILLE_MOYEN)
 			{
 			dessiner_ligne(p_p1,p_p2, C_couleurTrait) ;
-			dessiner_ligne(p_p1 + 1,p_p2 + 1, C_couleurTrait) ;
+			dessiner_ligne(p_pp1,p_pp2, C_couleurTrait) ;
 			}
-		else if (i_tailleTrait == 2)
+		else if (TAILLE_GRAND)
 			{
 			dessiner_ligne(p_p1,p_p2, C_couleurTrait) ;
-			dessiner_ligne(p_p1 + 1,p_p2 + 1, C_couleurTrait) ;
-			dessiner_ligne(p_p1 + 2,p_p2 + 2, C_couleurTrait) ;
+			dessiner_ligne(p_pp1,p_pp2, C_couleurTrait) ;
+			dessiner_ligne(p_pp3,p_pp4, C_couleurTrait) ;
 			}
 	i_outil = -1 ;
 	}
