@@ -21,7 +21,7 @@
 #include <time.h>
 #include "libgraphique.h"
 
-#define RATIO 1.2 //ratio de rayon pour tracé cercle
+#define RATIO 1.00 //ratio de rayon pour tracé cercle
 
 ////////////////////////////////////////////////////////////////////////////////
 // 0. variables globales et macros
@@ -32,7 +32,6 @@ Trace_evts trace_evts ;                    // idem
 Point dernier_clic = {-1,-1};
 int LARGEUR = -1 ;                         // largeur de l'écran en pixels
 int HAUTEUR = -1 ;                         // hauteur de l'écran en pixels
-//char *NOM_POLICE = "../lib/verdana.ttf" ;
 char *NOM_POLICE = "lib/verdana.ttf" ;
 #define octets_par_pixel ecran->format->BytesPerPixel
 #define largeur_ecran (ecran->pitch / 4)
@@ -43,6 +42,14 @@ char *NOM_POLICE = "lib/verdana.ttf" ;
 
 // ouvrir une fenêtre de taille largeur (x), hauteur (y)
 void ouvrir_fenetre(int largeur, int hauteur){
+    FILE *f=fopen(NOM_POLICE,"r");
+    if(!f)
+        {
+        fprintf(stderr,"Erreur: le chemin '%s' ne permet pas de trouver le dossier 'lib' et la police 'verdana.ttf'\n",NOM_POLICE);
+        exit(1);
+        }
+    fclose(f);
+
     SDL_Init(SDL_INIT_VIDEO); 
     ecran = SDL_SetVideoMode(largeur, hauteur, 32, SDL_HWSURFACE|SDL_DOUBLEBUF ); 
 

@@ -55,7 +55,7 @@ void dessinBoutons(void) ;
 void chargement(void) ;
 void affichage(void) ;
 void menu(void) ;
-//void texte()
+void sauvegarde(void) ;
 
 void gomme(void) ;
 void segment(void) ;
@@ -96,7 +96,7 @@ typedef enum
 int main(int argc, char *argv[])
 	{
 	ouvrir_fenetre(L_FENETRE, H_FENETRE) ;
-
+	
 	chargement() ;
 	//menu() ;
 	initialisation() ;
@@ -534,4 +534,26 @@ void rectangleRaye(void)
 		}
 
 	i_outil = -1 ;
+	}
+
+void sauvegarde (void)
+	{
+	char s_nomFichier [50] ;
+	char s_chemainFichier [255] = "" ;
+	
+	printf ("Nom du fichier: ") ;
+	scanf ("%s", s_nomFichier) ;
+	sprintf(s_chemainFichier, "sauvegardes/%s.bmp", s_nomFichier) ;
+	
+	SDL_Surface* dessin = NULL ;
+	SDL_Rect zoneDessin = {0, TAB_HAUT + 50, L_DESSIN, H_DESSIN} ;
+	/*
+	zoneDessin.x = 0 ;
+	zoneDessin.y = TAB_HAUT + 50 ;
+	zoneDessin.w = L_DESSIN ;
+	zoneDessin.h = H_DESSIN ;*/
+
+	dessin = SDL_CreateRGBSurface (0, L_DESSIN, H_DESSIN, 32, 0, 0, 0, 0) ;
+	SDL_BlitSurface (SDL_GetVideoSurface(), &zoneDessin, dessin, NULL) ;
+	SDL_SaveBMP(dessin, s_chemainFichier) ;
 	}
