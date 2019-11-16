@@ -1,10 +1,14 @@
-/* Directives de preprocesseur*/
+/************************************************************************************************/
+/*			cPAINT 					OUADRHIRI - SPINU, Info 1A	*/
+/************************************************************************************************/
+
+/* Directives de preprocesseur                                                                  */
 
 #include "lib/libgraphique.h"
 #include<stdio.h>
 #include<math.h>
 
-/* Constantes de préprocesseur */
+/* Constantes de préprocesseur 									*/
 
 /* Dimensions de la fenetre */
 #define L_FENETRE 1200
@@ -41,6 +45,8 @@
 #define Y_B_LOAD_SAUVEGARDE 650
 #define X_B_TEXTE 1000
 #define Y_B_TEXTE 500
+#define X_B_GOMME 1000
+#define Y_B_GOMME 550
 
 /* Positions (x;y) des palettes de couleurs */
 #define XP1 600
@@ -48,7 +54,7 @@
 #define XP2 900
 #define YP2 5
 
-/* Prototypes des fonctions */
+/* Prototypes des fonctions 									*/
 
 void bouton(int x, int y, int l, int h, Couleur cb, Couleur cs, int i_outilSelect) ;
 void afficherAide(char *aide, int taille) ;
@@ -74,18 +80,16 @@ void sauvegarde(void) ;
 void loadSauvegarde(void);
 void texte(void) ;
 
-/* Déclaration et initialistion des variables globales */
+/* Déclaration et initialistion des variables globales 						*/
 
 static Couleur C_couleurTrait = noir; 
 static Couleur C_couleurRemp = noir;
 static Point P_posSouris ;
 static int i_outil = -1 ; // Correspond à l'outil selectionné
 static Point P_clic ;
-static int b_esc ;
-static int b_clicGauche ;
 static int i_tailleTrait = 1 ;
 
-/* Déclaration des nouveaux types */
+/* Déclaration des nouveaux types 								*/
 
 typedef enum
 	{
@@ -99,8 +103,11 @@ typedef enum
 	RECTANGLE_RAYE,
 	SAUVEGARDE,
 	LOAD_SAUVEGARDE,
-	TEXTE
+	TEXTE,
+	GOMME
 	} i_outils ;
+
+/* MAIN												*/
 
 int main(int argc, char *argv[])
 	{
@@ -119,8 +126,6 @@ int main(int argc, char *argv[])
 
 		P_clic = clic_a_eu_lieu() ;
 		P_posSouris = deplacement_souris_a_eu_lieu() ;
-		b_esc = touche_a_ete_pressee(SDLK_SPACE) ;
-		b_clicGauche = touche_a_ete_pressee(SDLK_SPACE) ;
 		affichage() ;
 		gestionOutils() ;
 		gestionCouleurs() ;
@@ -135,7 +140,7 @@ int main(int argc, char *argv[])
 	return 0 ;
 	}
 
-// Fonctions 
+/* Fonctions											*/ 
 
 void fill(Couleur couleur)
 	{
@@ -242,7 +247,8 @@ void dessinBoutons(void)
 	Point P_sauv = {X_B_SAUVEGARDE + 30, Y_B_SAUVEGARDE + 10} ;
 	Point P_loadSauv = {X_B_LOAD_SAUVEGARDE + 10, Y_B_LOAD_SAUVEGARDE + 10} ;
 	Point P_texte = {X_B_TEXTE + 30, Y_B_TEXTE + 10} ;
-
+	Point P_gomme = {X_B_GOMME + 30, Y_B_GOMME + 10} ;
+	
 	/*CLEAR : */
 	bouton(L_DESSIN, 0, TAB_DROITE, TAB_HAUT, darkred, red, 666) ;	
 
@@ -298,6 +304,9 @@ void dessinBoutons(void)
 	bouton(X_B_TEXTE, Y_B_TEXTE, 200, 50, blue, lightblue, (int)TEXTE) ;
 	afficher_texte("TEXTE", 20, P_texte, blanc) ;
 
+	/*GOMME : */
+	bouton(X_B_GOMME, Y_B_GOMME, 200, 50, blue, lightblue, (int)GOMME) ;
+	afficher_texte("GOMME", 20, P_gomme, blanc) ;
 	}
 
 void gestionOutils(void)
@@ -305,6 +314,9 @@ void gestionOutils(void)
 	Point clic ;
 	switch (i_outil)
 		{
+		case -1 :
+			afficherAide("Selectionnez vos couleurs, puis l'outil qui vous plait", 20) ;
+			break ;
 		case (int)SEGMENT :
 			afficherAide("Choissisez 2 points pour dessiner un segment", 20) ;
 			segment() ;
@@ -351,7 +363,11 @@ void gestionOutils(void)
 			afficherAide("Cliquez là ou vous voulez afficher votre texte, puis allez sur la console", 15) ;
 			texte() ;
 			break ;
-		}
+		case (int)GOMME:
+			afficherAide("Cliquez pour commencer a gommer, recliquez pour arreter.", 18) ;
+			gomme() ;
+			break ;
+		}	
 	}
 
 void gestionCouleurs (void)
@@ -619,6 +635,28 @@ void texte(void)
 		scanf ("%d", &i_tailleTexte) ;
 		
 		afficher_texte(s_texte, i_tailleTexte, P_locaTexte, C_couleurTrait) ;
+		}
+	i_outil = -1 ;
+	}
+
+void gomme(void)
+	{
+	Point P_point;
+	
+	P_point = attendre_clic () ;
+	
+	if (dansDessin(P_point) == 1)
+		{
+		int i_gommeActive = 1 ;
+		while (i_gommeActive == 1)
+			{
+			dessiner_ligne(P_point, P_posSouris, blanc) ;
+			P_point = P_posSouris ;
+			actualiser() ;
+			if (clic_a_eu_lieu().x != -1)
+				i_gommeActive = 0 ;
+
+			}
 		}
 	i_outil = -1 ;
 	}
