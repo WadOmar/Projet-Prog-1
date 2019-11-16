@@ -12,29 +12,35 @@
 
 /* Dimensions de la zone consacree au dessin */
 #define L_DESSIN 1000
-#define H_DESSIN 800
+#define H_DESSIN 550
 
 /* Dimensions des differents onglets */
 #define TAB_HAUT 100
-#define TAB_DROITE 400
+#define TAB_DROITE 200
 
 /* Positions (x;y) des boutons */
 #define X_B_SEGMENT 1050
 #define Y_B_SEGMENT 170
-#define X_B_RECT_V 1010 
+#define X_B_POLY_V 1100
+#define Y_B_POLY_V 170
+#define X_B_RECT_V 1025 
 #define Y_B_RECT_V 240
-#define X_B_RECT_P 1060
+#define X_B_RECT_P 1075
 #define Y_B_RECT_P 240
-#define X_B_RECT_R 1110
+#define X_B_RECT_R 1125
 #define Y_B_RECT_R 240
 #define X_B_CERCLE_V 1050
 #define Y_B_CERCLE_V 310
-#define X_B_CERCLE_P 1060
+#define X_B_CERCLE_P 1100
 #define Y_B_CERCLE_P 310
-#define X_B_POLY_V 1100
-#define Y_B_POLY_V 170
-#define X_B_REMPL 1100
+#define X_B_REMPL 1000
 #define Y_B_REMPL 450
+#define X_B_SAUVEGARDE 1000
+#define Y_B_SAUVEGARDE 600
+#define X_B_LOAD_SAUVEGARDE 1000
+#define Y_B_LOAD_SAUVEGARDE 650
+#define X_B_TEXTE 1000
+#define Y_B_TEXTE 500
 
 /* Positions (x;y) des palettes de couleurs */
 #define XP1 600
@@ -54,8 +60,6 @@ void gestionOutils(void) ;
 void dessinBoutons(void) ;
 void chargement(void) ;
 void affichage(void) ;
-void menu(void) ;
-void sauvegarde(void) ;
 
 void gomme(void) ;
 void segment(void) ;
@@ -65,8 +69,10 @@ void polygoneVide(void) ;
 void rectanglePlein(void) ;
 void cerclePlein(void) ;
 void rectangleRaye(void) ;
-
 void remplissage(int x, int y, Couleur ac, Couleur nc) ;
+void sauvegarde(void) ;
+void loadSauvegarde(void);
+void texte(void) ;
 
 /* Déclaration et initialistion des variables globales */
 
@@ -90,15 +96,20 @@ typedef enum
 	POLYGONE_VIDE,
 	RECTANGLE_PLEIN,
 	CERCLE_PLEIN,
-	RECTANGLE_RAYE
+	RECTANGLE_RAYE,
+	SAUVEGARDE,
+	LOAD_SAUVEGARDE,
+	TEXTE
 	} i_outils ;
 
 int main(int argc, char *argv[])
 	{
 	ouvrir_fenetre(L_FENETRE, H_FENETRE) ;
-	
+	SDL_WM_SetCaption("cPaint (mieux que l'original)", NULL);
+	SDL_WM_SetIcon(SDL_LoadBMP("images/logoCpaint.bmp"), NULL);
+
 	chargement() ;
-	//menu() ;
+
 	initialisation() ;
 	int i_dansPaint = 1 ;
 	
@@ -193,20 +204,6 @@ void chargement(void)
 		}
 	}
 
-/*
-void menu(void)
-	{
-	extern int dansMenu ;
-	dansMenu = 1 ;
-	while (dansMenu == 1)
-		{
-		fill(blanc) ;
-		attendre_touche() ;
-		actualiser() ;
-		}
-	}
-*/
-
 void initialisation(void)
 	{
 	Point P_coin0 = {0,0}, P_coin1 = {0,150}, P_coin2 = {L_DESSIN, 0} ;
@@ -241,6 +238,10 @@ void dessinBoutons(void)
 	Point P_cercleV = {X_B_CERCLE_V + 25, Y_B_CERCLE_V + 25} ;
 	Point P_rectP1 = {X_B_RECT_P + 5, Y_B_RECT_P + 12}, P_rectP2 = {P_rectP1.x + 1, P_rectP1.y + 1} ;
 	Point P_cercleP = {X_B_CERCLE_P + 25, Y_B_CERCLE_P + 25} ;
+	Point P_rempl = {X_B_REMPL + 30, Y_B_REMPL + 10} ;
+	Point P_sauv = {X_B_SAUVEGARDE + 30, Y_B_SAUVEGARDE + 10} ;
+	Point P_loadSauv = {X_B_LOAD_SAUVEGARDE + 10, Y_B_LOAD_SAUVEGARDE + 10} ;
+	Point P_texte = {X_B_TEXTE + 30, Y_B_TEXTE + 10} ;
 
 	/*CLEAR : */
 	bouton(L_DESSIN, 0, TAB_DROITE, TAB_HAUT, darkred, red, 666) ;	
@@ -282,7 +283,21 @@ void dessinBoutons(void)
 	bouton(X_B_RECT_R, Y_B_RECT_R, 50, 50, violet, violetlight, (int)RECTANGLE_RAYE) ;
 	
 	/*REMPLISSAGE : */
-	bouton(X_B_REMPL, Y_B_REMPL, 66, 66, violet, violetlight, (int)REMPLISSAGE) ;
+	bouton(X_B_REMPL, Y_B_REMPL, 200, 50, noir, darkgray, (int)REMPLISSAGE) ;
+	afficher_texte("REMPLISSAGE", 17, P_rempl, blanc) ;
+
+	/*SAUVEGARDE : */
+	bouton(X_B_SAUVEGARDE, Y_B_SAUVEGARDE, 200, 50, darkgreen, green, (int)SAUVEGARDE) ;
+	afficher_texte("SAUVEGARDE", 17, P_sauv, blanc) ;
+	
+	/*LOAD_SAUVEGARDE : */
+	bouton(X_B_LOAD_SAUVEGARDE, Y_B_LOAD_SAUVEGARDE, 200, 50, darkgreen, green, (int)LOAD_SAUVEGARDE) ;
+	afficher_texte("IMPORTER SAUVEGARDE", 13, P_loadSauv, blanc) ;
+
+	/*TEXTE : */
+	bouton(X_B_TEXTE, Y_B_TEXTE, 200, 50, blue, lightblue, (int)TEXTE) ;
+	afficher_texte("TEXTE", 20, P_texte, blanc) ;
+
 	}
 
 void gestionOutils(void)
@@ -323,6 +338,18 @@ void gestionOutils(void)
 			Couleur ac = couleur_point (clic), nc = C_couleurRemp;
 			remplissage(clic.x, clic.y, ac, nc) ;
 			i_outil = -1 ;
+			break ;
+		case (int)SAUVEGARDE:
+			afficherAide("Donnez un nom a votre fichier sur la console.", 18) ;
+			sauvegarde() ;
+			break ;
+		case (int)LOAD_SAUVEGARDE:
+			afficherAide("Inserez le nom de votre fichier sur la console.", 18) ;
+			loadSauvegarde() ;
+			break ;
+		case (int)TEXTE:
+			afficherAide("Cliquez là ou vous voulez afficher votre texte, puis allez sur la console", 15) ;
+			texte() ;
 			break ;
 		}
 	}
@@ -525,7 +552,7 @@ void rectangleRaye(void)
 		dessiner_ligne(P_p3, P_p2, C_couleurTrait) ;
 		}
 
-	for (int iX = P_p1.x; iX < i_longueur; iX += 20)
+	for (int iX = P_p1.x; iX < i_longueur + P_p1.x; iX += 20)
 		{
 		P_r1.x = iX ;
 		P_r2.x = iX ;
@@ -547,13 +574,51 @@ void sauvegarde (void)
 	
 	SDL_Surface* dessin = NULL ;
 	SDL_Rect zoneDessin = {0, TAB_HAUT + 50, L_DESSIN, H_DESSIN} ;
-	/*
-	zoneDessin.x = 0 ;
-	zoneDessin.y = TAB_HAUT + 50 ;
-	zoneDessin.w = L_DESSIN ;
-	zoneDessin.h = H_DESSIN ;*/
 
 	dessin = SDL_CreateRGBSurface (0, L_DESSIN, H_DESSIN, 32, 0, 0, 0, 0) ;
 	SDL_BlitSurface (SDL_GetVideoSurface(), &zoneDessin, dessin, NULL) ;
 	SDL_SaveBMP(dessin, s_chemainFichier) ;
+	
+	printf("Fichier enregistré avec succès !\n") ;
+	i_outil = -1 ;
+	}
+
+void loadSauvegarde (void)
+	{
+	char s_nomFichier [50] ;
+	char s_chemainFichier [255] = "" ;
+	
+	printf ("Nom du fichier: ") ;
+	scanf ("%s", s_nomFichier) ;
+	sprintf(s_chemainFichier, "sauvegardes/%s.bmp", s_nomFichier) ;
+	
+	SDL_Surface* dessin = NULL ;
+	SDL_Rect zoneDessin = {0, TAB_HAUT + 50, L_DESSIN, H_DESSIN} ;
+
+	dessin = SDL_LoadBMP(s_chemainFichier) ;
+
+	SDL_BlitSurface (dessin, NULL, SDL_GetVideoSurface(), &zoneDessin) ;
+	
+	printf("Fichier chargé avec succès !\n") ;
+	i_outil = -1 ;
+	}
+
+void texte(void)
+	{
+	Point P_locaTexte ;
+	char s_texte [100] ;
+	int i_tailleTexte ;
+
+	P_locaTexte = attendre_clic() ; 	
+	
+	if (dansDessin(P_locaTexte) == 1)
+		{
+		printf ("Votre texte: ") ;
+		scanf ("%s", s_texte) ;
+		printf ("Taille: ") ;
+		scanf ("%d", &i_tailleTexte) ;
+		
+		afficher_texte(s_texte, i_tailleTexte, P_locaTexte, C_couleurTrait) ;
+		}
+	i_outil = -1 ;
 	}
