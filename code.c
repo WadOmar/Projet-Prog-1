@@ -208,7 +208,7 @@ void chargement(void) // Fausse barre de chargement, avec une quote différente 
 		}
 	}
 
-void initialisation(void) // Met la fenetre a 0
+void initialisation(void) // Met la fenetre a zero
 	{
 	Point P_coin0 = {0,0}, P_coin1 = {0,150}, P_coin2 = {L_DESSIN, 0} ;
 	Point P_palette1 = {XP1, YP1}, P_palette2 = {XP2, YP2} ;
@@ -223,6 +223,8 @@ void initialisation(void) // Met la fenetre a 0
 	afficher_image("images/roue_chromatique.bmp", P_palette1) ;
 	afficher_texte("Couleur remplissage :", 15, P_txtP2, khaki) ;
 	afficher_image("images/roue_chromatique.bmp", P_palette2) ;
+	
+	i_outil = -1 ;
 	}
 
 void affichage(void)
@@ -653,10 +655,11 @@ void mainLevee(void)
 			{
 			reinitialiser_evenements() ;
 			traiter_evenements() ;
-			P_point = P_posSouris ;
+			P_posSouris = deplacement_souris_a_eu_lieu() ;
+	
 			if (dansDessin(P_point) == 1 && dansDessin(P_posSouris) == 1)
 				dessiner_ligne(P_point, P_posSouris, C_couleurTrait) ;
-			
+			P_point = P_posSouris ;
 			actualiser() ;
 			if (clic_a_eu_lieu().x != -1)
 				i_mainLeveeActive = 0 ;
