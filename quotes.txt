@@ -1,3 +1,8 @@
 Programme partiellement concu par un fou qui s'est mit a vim au XXI siecle
+Mieux que photoshop ?
+A chaque lancement, cette phrase change de manière aleatoire
+Vous avez vu le nom de la fenetre et le logo ?
+N'hesitez pas a appuyer plusieurs fois sur un bouton si ca marche pas
+Je suis a court d'idee de phrases
 
 

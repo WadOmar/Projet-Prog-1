@@ -45,8 +45,8 @@
 #define Y_B_LOAD_SAUVEGARDE 650
 #define X_B_TEXTE 1000
 #define Y_B_TEXTE 500
-#define X_B_GOMME 1000
-#define Y_B_GOMME 550
+#define X_B_MAIN_LEVEE 1000
+#define Y_B_MAIN_LEVEE 550
 
 /* Positions (x;y) des palettes de couleurs */
 #define XP1 600
@@ -67,7 +67,7 @@ void dessinBoutons(void) ;
 void chargement(void) ;
 void affichage(void) ;
 
-void gomme(void) ;
+void mainLevee(void) ;
 void segment(void) ;
 void rectangleVide(void) ;
 void cercleVide(void) ;
@@ -87,7 +87,6 @@ static Couleur C_couleurRemp = noir;
 static Point P_posSouris ;
 static int i_outil = -1 ; // Correspond à l'outil selectionné
 static Point P_clic ;
-static int i_tailleTrait = 1 ;
 
 /* Déclaration des nouveaux types 								*/
 
@@ -104,7 +103,7 @@ typedef enum
 	SAUVEGARDE,
 	LOAD_SAUVEGARDE,
 	TEXTE,
-	GOMME
+	MAIN_LEVEE, 
 	} i_outils ;
 
 /* MAIN												*/
@@ -142,34 +141,34 @@ int main(int argc, char *argv[])
 
 /* Fonctions											*/ 
 
-void fill(Couleur couleur)
+void fill(Couleur couleur) // Permet de remplir la fenetre d'une certaine couleur
 	{
 	Point P_coin = {0,0} ;
 	dessiner_rectangle (P_coin, L_FENETRE, H_FENETRE, couleur) ;
 	}
 
-void bouton(int x, int y, int l, int h, Couleur cb, Couleur cs, int i_outilSelect)
+void bouton(int x, int y, int l, int h, Couleur cb, Couleur cs, int i_outilSelect) // Genere un bouton, qui change de couleur selon si la souris est dessus (cb) ou pas (cs)
 	{
 	Point P_coin = {x, y};
 
-	if (P_posSouris.x > P_coin.x && P_posSouris.x < P_coin.x + l && P_posSouris.y > P_coin.y && P_posSouris.y < P_coin.y + h)
+	if (P_posSouris.x > P_coin.x && P_posSouris.x < P_coin.x + l && P_posSouris.y > P_coin.y && P_posSouris.y < P_coin.y + h) // Verifie si la souris est dessus
 		{
 		dessiner_rectangle(P_coin, l, h, cs) ;
 		
-		if (P_clic.x != -1 && P_clic.y != -1)
+		if (P_clic.x != -1 && P_clic.y != -1) // Si clic, selectionner l'outil
 			{
 			i_outil = i_outilSelect ;
 			
-			if (i_outilSelect == 666)
+			if (i_outilSelect == 666) // Verifie si le "clear" est selectionné
 				initialisation () ;
 			}
 		}
-	else 
+	else // Si la souris n'est pas sur le bouton
 		dessiner_rectangle(P_coin, l, h, cb) ;
 	
 	}
 
-void chargement(void)
+void chargement(void) // Fausse barre de chargement, avec une quote différente a chaque lancement
 	{
 	int i_progression = 0 ;
 
@@ -181,35 +180,35 @@ void chargement(void)
 
 	FILE* fichier = NULL ;
 	char s_chaine[100] = "";
-	int i_ligne = entier_aleatoire(10) ;
+	int i_ligne = entier_aleatoire(6) ;
 
 	fichier = fopen("quotes.txt", "r+") ;
 
 	if (fichier != NULL)
 		{
-		for (int iLigne = 0; iLigne < i_ligne; iLigne++) // On lit le fichier tant qu'on ne reçoit pas d'erreur (NULL)
+		for (int iLigne = 0; iLigne < i_ligne; iLigne++)
 			fgets(s_chaine, 100, fichier) ;
 
 		fclose(fichier) ;
 		}
 
-	Point P_quote = {L_FENETRE/2 - (taille_texte(s_chaine, 30).x)/2, P_chargement.y + 50};
+	Point P_quote = {L_FENETRE/2 - (taille_texte(s_chaine, 30).x)/2, P_chargement.y + 50}; // Affiche la phrase selectionnee aleatoirement
 	Point taille_texte(char *texte, int taille);
 
 	afficher_texte(s_chaine, 30, P_quote, jaune) ;
 	afficher_texte("CHARGEMENT", 30, P_chargement, blanc) ;
 
-	while (i_progression < 500)
+	while (i_progression < 500) 
 		{
 		afficher_image("images/logoCpaint.bmp", P_logo) ;
-		dessiner_rectangle(P_milieu, i_progression, 20, rouge) ;
+		dessiner_rectangle(P_milieu, i_progression, 20, rouge) ; // Cree un rectangle dont la longueur augmente au fur et a mesure
 		actualiser() ;
 		i_progression ++ ;
 		attente(3) ;
 		}
 	}
 
-void initialisation(void)
+void initialisation(void) // Met la fenetre a 0
 	{
 	Point P_coin0 = {0,0}, P_coin1 = {0,150}, P_coin2 = {L_DESSIN, 0} ;
 	Point P_palette1 = {XP1, YP1}, P_palette2 = {XP2, YP2} ;
@@ -232,7 +231,7 @@ void affichage(void)
 	actualiser() ;
 	}
 
-void dessinBoutons(void)
+void dessinBoutons(void) // Dessine l'ensemble des boutons
 	{
 	Point P_rect1 = {X_B_RECT_V + 5, Y_B_RECT_V + 12}, P_rect2 =  {X_B_RECT_V + 45, Y_B_RECT_V + 12} ;
 	Point P_rect3 = {X_B_RECT_V + 45, Y_B_RECT_V + 38}, P_rect4 = {X_B_RECT_V + 5, Y_B_RECT_V + 38} ;
@@ -247,10 +246,12 @@ void dessinBoutons(void)
 	Point P_sauv = {X_B_SAUVEGARDE + 30, Y_B_SAUVEGARDE + 10} ;
 	Point P_loadSauv = {X_B_LOAD_SAUVEGARDE + 10, Y_B_LOAD_SAUVEGARDE + 10} ;
 	Point P_texte = {X_B_TEXTE + 30, Y_B_TEXTE + 10} ;
-	Point P_gomme = {X_B_GOMME + 30, Y_B_GOMME + 10} ;
-	
+	Point P_mainLevee = {X_B_MAIN_LEVEE + 30, Y_B_MAIN_LEVEE + 10} ;
+	Point P_clear = {L_DESSIN + 30, 30} ;
+
 	/*CLEAR : */
 	bouton(L_DESSIN, 0, TAB_DROITE, TAB_HAUT, darkred, red, 666) ;	
+	afficher_texte ("CLEAR", 20, P_clear, noir) ;
 
 	/*SEGMENT : */
 	bouton(X_B_SEGMENT, Y_B_SEGMENT, 50, 50, violet, violetlight, (int)SEGMENT) ;
@@ -304,9 +305,9 @@ void dessinBoutons(void)
 	bouton(X_B_TEXTE, Y_B_TEXTE, 200, 50, blue, lightblue, (int)TEXTE) ;
 	afficher_texte("TEXTE", 20, P_texte, blanc) ;
 
-	/*GOMME : */
-	bouton(X_B_GOMME, Y_B_GOMME, 200, 50, blue, lightblue, (int)GOMME) ;
-	afficher_texte("GOMME", 20, P_gomme, blanc) ;
+	/*MAIN_LEVEE : */
+	bouton(X_B_MAIN_LEVEE, Y_B_MAIN_LEVEE, 200, 50, blue, lightblue, (int)MAIN_LEVEE) ;
+	afficher_texte("MAIN_LEVEE", 20, P_mainLevee, blanc) ;
 	}
 
 void gestionOutils(void)
@@ -363,17 +364,17 @@ void gestionOutils(void)
 			afficherAide("Cliquez là ou vous voulez afficher votre texte, puis allez sur la console", 15) ;
 			texte() ;
 			break ;
-		case (int)GOMME:
-			afficherAide("Cliquez pour commencer a gommer, recliquez pour arreter.", 18) ;
-			gomme() ;
+		case (int)MAIN_LEVEE:
+			afficherAide("Cliquez pour commencer a dessiner, recliquez pour arreter.", 18) ;
+			mainLevee() ;
 			break ;
 		}	
 	}
 
 void gestionCouleurs (void)
 	{
-	if (P_clic.x >= XP1 && P_clic.x <= XP1 + 90 && P_clic.y >= YP1 && P_clic.y <= YP1 + 90)
-		C_couleurTrait = couleur_point (P_clic) ;
+	if (P_clic.x >= XP1 && P_clic.x <= XP1 + 90 && P_clic.y >= YP1 && P_clic.y <= YP1 + 90) // Verifie si le clic se situe dans la palette
+		C_couleurTrait = couleur_point (P_clic) ; // Si oui, recupere la couleur correspondante
 	else if (P_clic.x >= XP2 && P_clic.x <= XP2 + 90 && P_clic.y >= YP2 && P_clic.y <= YP2 + 90)
 		C_couleurRemp = couleur_point (P_clic) ;
 	}
@@ -386,7 +387,7 @@ void afficherAide(char *aide, int taille)
 	actualiser() ;
 	}
 
-int dansDessin(Point P_point)
+int dansDessin(Point P_point) // Verifie pour un point donné si il se situe dans la zone destinée au dessin
 	{
 	if (P_point.x < 0)
 		{
@@ -630,7 +631,7 @@ void texte(void)
 	if (dansDessin(P_locaTexte) == 1)
 		{
 		printf ("Votre texte: ") ;
-		scanf ("%s", s_texte) ;
+		fgets (s_texte, 100, stdin) ;
 		printf ("Taille: ") ;
 		scanf ("%d", &i_tailleTexte) ;
 		
@@ -639,7 +640,7 @@ void texte(void)
 	i_outil = -1 ;
 	}
 
-void gomme(void)
+void mainLevee(void)
 	{
 	Point P_point;
 	
@@ -647,14 +648,18 @@ void gomme(void)
 	
 	if (dansDessin(P_point) == 1)
 		{
-		int i_gommeActive = 1 ;
-		while (i_gommeActive == 1)
+		int i_mainLeveeActive = 1 ;
+		while (i_mainLeveeActive == 1)
 			{
-			dessiner_ligne(P_point, P_posSouris, blanc) ;
+			reinitialiser_evenements() ;
+			traiter_evenements() ;
 			P_point = P_posSouris ;
+			if (dansDessin(P_point) == 1 && dansDessin(P_posSouris) == 1)
+				dessiner_ligne(P_point, P_posSouris, C_couleurTrait) ;
+			
 			actualiser() ;
 			if (clic_a_eu_lieu().x != -1)
-				i_gommeActive = 0 ;
+				i_mainLeveeActive = 0 ;
 
 			}
 		}
