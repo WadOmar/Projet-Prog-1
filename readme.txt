@@ -9,7 +9,7 @@ Fonctionalitées:
 		* rectangle plein
 		* cercle vide
 		* cercle plein
-		* polygone vide
+		* polygone vide : clic gauche pour faire des cotés, clic droit = fermer le polygone
 		* rectangle rayé
 		* dessin à main levé : Un clic pour commencer, le deuxième pour arrêter
 		* remplissage : Appuyer n'importe où sur la zone de dessin, pour propager une couleur (eviter tout l'ecran)
